@@ -1,0 +1,11 @@
+The index.html, styles.css and script.js } combined known as SET Dark matter
+
+Find what's the missing connections with all the other files as an extension fileset?
+
+popup files will exist but these new 3 files are under settings/ folder and this will overlay over the screen when POPUP button is clicked. And instead of popup these will openup
+
+I have this set dark matter as frontend, I want to fully connect it with background, content and manifest
+
+Make sure everything is well connected with debugging statements everywhere to print any issue in console
+
+Do not include "Autofill" in settings panel

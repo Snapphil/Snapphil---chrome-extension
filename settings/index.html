@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapPhil - AI Job Application Assistant</title>
+    
+    <!-- Use local stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- External Libraries - from CDN for this one library only -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Local PDF.js libraries - use relative paths for extension context -->
+    <script src="../lib/pdfjs/build/pdf.mjs" type="module"></script>
+    <script src="../lib/jspdf/jspdf.umd.min.js"></script>
+    <script src="../lib/marked.min.js"></script>
+    <script src="../auth.js"></script>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-inner">
+        <!-- Welcome overlay (only shown to new users) -->
+        <div id="welcomePanel" class="welcome-panel">
+            <!-- First welcome page -->
+            <div id="welcomePage" class="panel-content active-panel">
+                <div class="welcome-message-container">
+                    <img src="welcome-page.png" alt="Welcome Page" class="welcome-page-img">
+                </div>
+                <button id="continueToTermsBtn" class="panel-btn">Continue</button>
+            </div>
+            
+            <!-- Terms page -->
+            <div id="termsPage" class="panel-content">
+                <h2>Terms & Conditions</h2>
+                <div class="terms-box">
+                    <p>By using SnapPhil, you agree that your resume data will be processed to assist with job applications. Your data is stored securely and not sold to third parties.</p>
+                </div>
+                <div class="button-container">
+                    <button id="declineTermsBtn" class="action-btn decline-btn">Decline</button>
+                    <button id="acceptTermsBtn" class="action-btn accept-btn">Accept</button>
+                </div>
+            </div>
+            
+            <!-- Signup page -->
+            <div id="signupPage" class="panel-content">
+                <div class="signup-header">
+                    <img src="../snapphil-logo.png" alt="SnapPhil Logo" class="logo-image" style="width: 56px; height: 56px;">
+                    <h2>Create Your Account</h2>
+                    <p>Get started with SnapPhil to make job applications easier</p>
+                </div>
+                
+                <div class="signup-form">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="signupName" placeholder="Enter your full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="signupEmail" placeholder="Enter your email address">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="signupPassword" placeholder="Create a password">
+                        <div class="form-hint">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                            Minimum 8 characters with letters and numbers
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="signupConfirmPassword" placeholder="Confirm your password">
+                    </div>
+                    
+                    <div class="signup-options">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="signup-newsletter" checked>
+                            <span class="checkbox-label">Send me job tips and updates</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="error-message" id="signupError"></div>
+                
+                <div class="button-container">
+                    <button id="backToTermsBtn" class="action-btn decline-btn">Back</button>
+                    <button id="createAccountBtn" class="action-btn accept-btn">Create Account</button>
+                </div>
+                
+                <div class="login-link">
+                    Already have an account? <span id="showLoginBtn" class="login-link-btn">Log in</span>
+                </div>
+            </div>
+            
+            <!-- Login page -->
+            <div id="loginPage" class="panel-content">
+                <div class="signup-header">
+                    <img src="../snapphil-logo.png" alt="SnapPhil Logo" class="logo-image" style="width: 56px; height: 56px;">
+                    <h2>Log In</h2>
+                    <p>Welcome back to SnapPhil</p>
+                </div>
+                
+                <div class="signup-form">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="loginEmail" placeholder="Enter your email address">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password">
+                    </div>
+                </div>
+                
+                <div class="error-message" id="loginError"></div>
+                
+                <div class="button-container">
+                    <button id="backToSignupBtn" class="action-btn decline-btn">Back</button>
+                    <button id="loginBtn" class="action-btn accept-btn">Log In</button>
+                </div>
+                
+                <div class="login-link">
+                    Don't have an account? <span id="showSignupBtn" class="login-link-btn">Sign up</span>
+                </div>
+            </div>
+        </div>
+        <div class="settings-sidebar">
+            <div class="logo">
+                <img src="../snapphil-logo.png" alt="SnapPhil Logo" class="logo-image">
+                <h2>SnapPhil</h2>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-item active" data-tab="profile">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>Profile</span>
+                </div>
+                <div class="nav-item" data-tab="applications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                    <span>Applications</span>
+                    <span class="tab-badge"></span>
+                </div>
+                <div class="nav-item" data-tab="coverletter">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>Cover Letter</span>
+                </div>
+                <div class="nav-item" data-tab="advanced">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>Advanced</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="section-header">Settings</div>
+                <div class="nav-item" data-tab="privacy">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span>Privacy</span>
+                </div>
+                <div class="nav-item" data-tab="feedinfo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    <span>Feed More Info</span>
+                </div>
+                <div class="nav-item" data-tab="help">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span>Help & Support</span>
+                </div>
+            </div>
+
+            <!-- User profile section (visible when logged in) -->
+            <div class="user-profile auth-required" style="display: none;">
+                <div class="user-profile-container">
+                    <div class="user-avatar-container">
+                        <div class="user-avatar-small">
+                            <span class="user-initial" id="userInitial">U</span>
+                        </div>
+                        <div class="logout-tooltip">
+                            <button class="logout-btn" id="logoutBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                    <polyline points="16 17 21 12 16 7"></polyline>
+                                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                                </svg>
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">User</div>
+                        <div class="user-email" id="userEmail"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-content">
+            <!-- Profile Tab -->
+            <div id="profile" class="tab-content active">
+                <h2 class="section-title">Profile Settings</h2>
+                <p class="section-subtitle">Update your profile information to improve job application filling accuracy</p>
+
+                <div class="resume-upload-card" id="resumeUploadCard">
+                    <!-- Upload Progress Bar -->
+                    <div class="upload-progress-overlay" id="uploadProgressOverlay" style="display: none;">
+                        <div class="upload-progress-bar" id="uploadProgressBar"></div>
+                    </div>
+                    
+                    <!-- Empty State - shown when no resume is uploaded -->
+                    <div class="empty-state" id="emptyState">
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="upload-label">Upload your résumé</div>
+                        <button class="browse-button" id="browseButton" type="button" aria-label="Browse for resume file">Browse</button>
+                        <div class="file-note">PDF ≤ 5 MB</div>
+                        <input type="file" id="resume-file-input" accept=".pdf,.doc,.docx" style="display:none" aria-label="Resume file input">
+                    </div>
+
+                    <!-- File Info Bar - shown when resume is uploaded -->
+                    <div class="file-info-bar" id="fileInfoBar" style="display: none;">
+                        <div class="file-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="13 2 13 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div class="file-details">
+                            <div class="file-name" id="fileName">resume.pdf</div>
+                            <div class="file-meta" id="fileMeta">Last uploaded: Today · Parsed 12 / 15 fields</div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="replace-button" id="replaceButton" type="button" aria-label="Replace resume file">Replace</button>
+                            <a class="download-link" id="downloadLink" href="#" download aria-label="Download resume file">Download</a>
+                        </div>
+                        <input type="file" id="replace-file-input" accept=".pdf,.doc,.docx" style="display:none" aria-label="Replace resume file input">
+                    </div>
+                </div>
+
+                <div class="personal-info-toggle">
+                    <span>Personal Information (Optional)</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                
+                <div class="personal-info-fields">
+                    <div class="form-group">
+                        <label class="form-label">Full Name (Optional)</label>
+                        <input type="text" class="form-control" id="fullName" placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address (Optional)</label>
+                        <input type="email" class="form-control" id="emailAddress" placeholder="Enter your email address">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Phone Number (Optional)</label>
+                        <input type="tel" class="form-control" id="phoneNumber" placeholder="Enter your phone number">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">LinkedIn Profile URL (Optional)</label>
+                        <input type="url" class="form-control" id="linkedinUrl" placeholder="https://linkedin.com/in/your-profile">
+                    </div>
+                </div>
+
+                <div class="context-container">
+                    <div class="context-header">
+                        <label class="context-label">Additional Context</label>
+                        <div class="context-counter"><span id="char-count">0</span>/500</div>
+                    </div>
+                    <div class="context-input-wrapper">
+                        <textarea class="context-input" placeholder="Add any additional details not in your resume (e.g., work authorization status, special instructions for AI)" maxlength="500"></textarea>
+                        <div class="context-decoration"></div>
+                        <div class="context-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="context-tags">
+                        <div class="context-tag" data-tag="Work authorization">Work authorization</div>
+                        <div class="context-tag" data-tag="Freelance availability">Freelance availability</div>
+                        <div class="context-tag" data-tag="Relocation preferences">Relocation preferences</div>
+                    </div>
+                    <div class="context-footer">
+                        <div class="context-hint">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 8v4"></path>
+                                <path d="M12 16h.01"></path>
+                            </svg>
+                            <span>This information will help our AI better understand your background and preferences</span>
+                        </div>
+                        <div class="context-actions">
+                            <button class="btn-icon btn-cancel" id="context-cancel-btn" title="Cancel changes">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                            <button class="btn-icon btn-save" id="context-save-btn" title="Save changes">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- (Removed Auto-Fill button as requested) -->
+            </div>
+
+            <!-- Applications Tab -->
+            <div id="applications" class="tab-content">
+                <h2 class="section-title">Application History</h2>
+                <p class="section-subtitle">Track and manage your job applications</p>
+
+                <div class="application-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="rgba(100, 255, 255, 0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                                <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                                <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Applied</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255, 180, 100, 0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="4" y="5" width="16" height="16" rx="2"></rect>
+                                <path d="M16 3v4"></path>
+                                <path d="M8 3v4"></path>
+                                <path d="M4 11h16"></path>
+                                <path d="M10 16h4"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Interviews</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="rgba(100, 255, 150, 0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Offers</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" class="card-icon">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Daily Application Limit
+                        </div>
+                        <div class="limit-badge">0%</div>
+                    </div>
+                    <div class="limit-indicator">
+                        <div class="limit-progress" style="width: 0%">
+                            <div class="limit-progress-glow"></div>
+                        </div>
+                    </div>
+                    <div class="limit-text">
+                        <span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+                                <path d="M5 12h14"></path>
+                                <path d="M12 5v14"></path>
+                            </svg>
+                            0 applications used today
+                        </span>
+                        <span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                            20 applications available
+                        </span>
+                    </div>
+                    <div class="form-hint">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        Your daily limit resets at midnight UTC
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" class="card-icon">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            Recent Applications
+                        </div>
+                        <button class="btn btn-outlined">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                            View All
+                        </button>
+                    </div>
+                    <div class="recent-applications">
+                        <div class="empty-state">
+                            <i class="fas fa-clipboard-list"></i>
+                            <p>No applications tracked yet.</p>
+                            <p>Use auto-fill to track your applications.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cover Letter Tab -->
+            <div id="coverletter" class="tab-content">
+                <h2 class="section-title">Cover Letter Settings</h2>
+                <p class="section-subtitle">Customize how your AI-generated cover letters are created</p>
+
+                <div class="form-group">
+                    <label class="form-label">Cover Letter Style</label>
+                    <select class="form-control" id="coverLetterStyle">
+                        <option value="Professional">Professional (Standard)</option>
+                        <option value="Creative">Creative & Bold</option>
+                        <option value="Academic">Academic & Formal</option>
+                        <option value="Concise">Concise & Direct</option>
+                    </select>
+                    <div class="form-hint">This affects the tone and structure of your generated cover letters</div>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Include Specific Achievements</div>
+                        <div class="toggle-hint">Highlight quantifiable results and achievements</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked data-setting="achievements" id="includeAchievements">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Mention Company Research</div>
+                        <div class="toggle-hint">Show your knowledge of the company and its mission</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked data-setting="companyResearch" id="mentionCompanyResearch">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Include Salary Expectations</div>
+                        <div class="toggle-hint">Only if requested in job description</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" data-setting="salary" id="includeSalary">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Custom Closing Statement</label>
+                    <textarea class="form-control" rows="3" id="customClosing" placeholder="Optional: Add your preferred closing statement"></textarea>
+                    <div class="form-hint">Leave blank to use our AI-generated closing</div>
+                </div>
+
+                <div class="settings-footer">
+                    <button class="btn btn-reset" id="resetCoverLetterBtn">Reset to Default</button>
+                    <button class="btn btn-save" id="saveCoverLetterBtn">Save Changes</button>
+                </div>
+            </div>
+
+            <!-- Advanced Tab -->
+            <div id="advanced" class="tab-content">
+                <h2 class="section-title">Advanced Settings</h2>
+                <p class="section-subtitle">Fine-tune how SnapPhil works</p>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Fill Optional Fields</div>
+                        <div class="toggle-hint">Fill all fields including those marked as optional</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="autoSubmitCheckbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Enhanced Job Matching</div>
+                        <div class="toggle-hint">Tailors responses to better match job descriptions</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="enhancedMatchingCheckbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Autosave Applications</div>
+                        <div class="toggle-hint">Track applications even if not submitted</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="autosaveCheckbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Auto-Open on Job Pages</div>
+                        <div class="toggle-hint">Automatically open SnapPhil when visiting job application pages</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="autoOpenPopupCheckbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">AI Personality</label>
+                    <select class="form-control" id="aiPersonalitySelect">
+                        <option value="Professional">Professional (Default)</option>
+                        <option value="Enthusiastic">Enthusiastic</option>
+                        <option value="Technical">Technical</option>
+                        <option value="Creative">Creative</option>
+                    </select>
+                    <div class="form-hint">Affects tone of generated content</div>
+                </div>
+
+                <div class="settings-footer">
+                    <button class="btn btn-reset" id="resetSettingsBtn">Reset to Default</button>
+                    <button class="btn btn-save" id="saveSettingsBtn">Save Changes</button>
+                </div>
+            </div>
+
+            <!-- Privacy Tab -->
+            <div id="privacy" class="tab-content">
+                <h2 class="section-title">Privacy Settings</h2>
+                <p class="section-subtitle">Control how your data is used and stored</p>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Store Resume Data Locally</div>
+                        <div class="toggle-hint">Keep resume data on your device only</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="storeLocallyCheckbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Allow Anonymous Usage Analytics</div>
+                        <div class="toggle-hint">Help us improve SnapPhil (no personal data shared)</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="analyticsCheckbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Store Application History</div>
+                        <div class="toggle-hint">Track which jobs you've applied to</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="trackHistoryCheckbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Data Management</div>
+                    </div>
+                    <button class="btn btn-block" id="exportDataBtn" style="margin-bottom: 8px;">Export My Data</button>
+                    <button class="btn btn-block" id="deleteDataBtn" style="color: rgba(255, 80, 80, 0.9);">Delete All My Data</button>
+                </div>
+
+                <div class="settings-footer">
+                    <button class="btn btn-save" id="savePrivacyBtn">Save Changes</button>
+                </div>
+            </div>
+
+            <!-- Feed More Info Tab -->
+            <div id="feedinfo" class="tab-content">
+                <div class="questionnaire-container">
+                    <div class="question-screen" id="question-1">
+                        <div class="question-indicator">1 → </div>
+                        <h2 class="question-title">What's your current job search status?</h2>
+                        
+                        <div class="options-container">
+                            <div class="option-item">
+                                <input type="radio" id="status-active" name="job-status" class="option-input">
+                                <label for="status-active" class="option-label">Actively searching</label>
+                            </div>
+                            
+                            <div class="option-item">
+                                <input type="radio" id="status-passive" name="job-status" class="option-input">
+                                <label for="status-passive" class="option-label">Passively looking</label>
+                            </div>
+                            
+                            <div class="option-item">
+                                <input type="radio" id="status-employed" name="job-status" class="option-input">
+                                <label for="status-employed" class="option-label">Employed but open to opportunities</label>
+                            </div>
+                            
+                            <div class="option-item">
+                                <input type="radio" id="status-other" name="job-status" class="option-input">
+                                <label for="status-other" class="option-label">Other</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-screen hidden" id="question-2">
+                        <div class="question-indicator">2 → </div>
+                        <h2 class="question-title">Which industry are you targeting in your job search?</h2>
+                        
+                        <div class="text-input-container">
+                            <input type="text" class="question-text-input" placeholder="e.g. Technology, Healthcare, Finance">
+                            <div class="input-underline"></div>
+                        </div>
+                        
+                        <button class="question-button" id="q2-next">
+                            OK
+                            <span class="button-hint">press Enter ↵</span>
+                        </button>
+                    </div>
+                    
+                    <div class="question-screen hidden" id="question-3">
+                        <div class="question-indicator">3 → </div>
+                        <h2 class="question-title">What's your preferred work arrangement?</h2>
+                        
+                        <div class="options-container">
+                            <div class="option-item">
+                                <input type="radio" id="work-remote" name="work-arrangement" class="option-input">
+                                <label for="work-remote" class="option-label">Fully remote</label>
+                            </div>
+                            
+                            <div class="option-item">
+                                <input type="radio" id="work-hybrid" name="work-arrangement" class="option-input">
+                                <label for="work-hybrid" class="option-label">Hybrid</label>
+                            </div>
+                            
+                            <div class="option-item">
+                                <input type="radio" id="work-onsite" name="work-arrangement" class="option-input">
+                                <label for="work-onsite" class="option-label">On-site</label>
+                            </div>
+                            
+                            <div class="option-item">
+                                <input type="radio" id="work-flexible" name="work-arrangement" class="option-input">
+                                <label for="work-flexible" class="option-label">Flexible/No preference</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-screen hidden" id="question-4">
+                        <div class="question-indicator">4 → </div>
+                        <h2 class="question-title">How many applications do you plan to submit weekly?</h2>
+                        
+                        <div class="options-container">
+                            <div class="option-item">
+                                <input type="radio" id="apps-few" name="app-volume" class="option-input">
+                                <label for="apps-few" class="option-label">1-5 applications</label>
+                            </div>
+                            
+                            <div class="option-item">
+                                <input type="radio" id="apps-moderate" name="app-volume" class="option-input">
+                                <label for="apps-moderate" class="option-label">6-15 applications</label>
+                            </div>
+                            
+                            <div class="option-item">
+                                <input type="radio" id="apps-many" name="app-volume" class="option-input">
+                                <label for="apps-many" class="option-label">16+ applications</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-screen hidden" id="complete-screen">
+                        <div class="completion-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <h2 class="completion-title">Thank you!</h2>
+                        <p class="completion-text">We've tailored SnapPhil to optimize your job search experience based on your preferences.</p>
+                        
+                        <button class="question-button completion-button" id="complete-button">
+                            Done
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Help Tab -->
+            <div id="help" class="tab-content">
+                <h2 class="section-title">Help & Support</h2>
+                <p class="section-subtitle">Get assistance with using SnapPhil</p>
+
+                <div class="faq-container">
+                    <h3 class="faq-heading">Frequently Asked Questions</h3>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>How does SnapPhil protect my data?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p>SnapPhil takes data security seriously. All your personal information and resume data are encrypted and securely stored. We never sell your data to third parties and only use it to improve your job application experience. You can delete your data at any time from the Privacy settings.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Can I use SnapPhil on mobile devices?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Currently, SnapPhil is only available as a Chrome extension for desktop browsers. We're actively working on mobile support and will notify users when it becomes available. For the best experience, please use SnapPhil on a desktop or laptop computer.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>How do I know when my daily limit resets?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Your daily application limit resets at midnight UTC every day. You can view your current usage and remaining quota on the Applications tab. The system automatically refreshes your available applications at the reset time without any action needed from you.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Can I edit an auto-filled application?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes, you can always edit any field after SnapPhil auto-fills it. Simply click on any filled field to modify the content. Your changes won't affect future auto-fills unless you update your profile information in the settings.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support Message Form -->
+                <div class="support-container">
+                    <h3 class="support-heading">Contact Support</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" id="support-subject" class="form-control" placeholder="What can we help you with?">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea id="support-message" class="form-control support-message" placeholder="Describe your issue or question"></textarea>
+                    </div>
+                    
+                    <button id="send-support-message" class="btn btn-send">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        <span>Send Message</span>
+                    </button>
+                </div>
+                
+                <!-- Support Query History -->
+                <div class="support-history auth-required">
+                    <h3 class="support-heading">
+                        My Support Queries
+                        <button id="refresh-support-queries" class="btn-icon" title="Refresh queries">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                                <polyline points="1 4 1 10 7 10"></polyline>
+                                <polyline points="23 20 23 14 17 14"></polyline>
+                                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                            </svg>
+                        </button>
+                    </h3>
+                    <div id="support-queries-container" class="support-queries-container">
+                        <!-- Queries will be dynamically inserted here -->
+                        <div class="support-query-loading">
+                            <div class="loading-spinner"></div>
+                            <p>Loading support queries...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>  <!-- end .settings-inner -->
+
+        <!-- Progress Window for AI Actions - extension UI -->
+        <div id="progressWindow" class="progress-window hidden">
+            <div class="progress-header">
+                <div class="progress-title">AI filling form...</div>
+                <button id="collapseProgressBtn" class="collapse-btn"><i class="fas fa-chevron-down"></i></button>
+                <button id="closeProgressBtn" class="close-btn">&times;</button>
+            </div>
+            <div class="progress-body">
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-percentage" id="progressPercentage">0%</div>
+                </div>
+                
+                <!-- Status Cards Mini View -->
+                <div class="status-cards-mini">
+                    <div class="status-card-mini" data-id="init"><i class="fas fa-rocket"></i></div>
+                    <div class="status-card-mini" data-id="detect"><i class="fas fa-search"></i></div>
+                    <div class="status-card-mini" data-id="analyze"><i class="fas fa-brain"></i></div>
+                    <div class="status-card-mini" data-id="fill"><i class="fas fa-pen"></i></div>
+                    <div class="status-card-mini" data-id="submit"><i class="fas fa-paper-plane"></i></div>
+                </div>
+                
+                <div class="progress-current">
+                    <div class="current-label">Currently:</div>
+                    <div id="currentAction" class="current-action">Initializing...</div>
+                </div>
+                <div id="progressLog" class="progress-log">
+                    <!-- Log entries will be added dynamically -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading Overlay (iOS Style) -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-message" id="loadingMessage">Loading...</div>
+            <div class="loading-description" id="loadingDescription">We're fetching your data from the server.</div>
+            <div class="loading-progress">
+                <div class="loading-progress-bar" id="loadingProgressBar" style="width: 0%;"></div>
+            </div>
+            <div class="loading-time" id="loadingTime">Estimated time: a few seconds</div>
+        </div>
+        
+        <div id="tutorial-container"></div>
+    </div>
+
+    <!-- Extension-specific script -->
+    <!-- Load settings script as ES module to allow PDF.js import -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>

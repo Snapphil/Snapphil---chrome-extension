@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapPhil Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                    // Context section buttons
+            const saveBtn = document.querySelector('.btn-save');
+            const cancelBtn = document.querySelector('.btn-cancel');
+            
+            saveBtn.addEventListener('click', function() {
+                // Show a success effect
+                this.style.backgroundColor = 'rgba(100, 255, 100, 0.2)';
+                this.style.borderColor = 'rgba(100, 255, 100, 0.4)';
+                
+                // Reset after animation
+                setTimeout(() => {
+                    this.style.backgroundColor = '';
+                    this.style.borderColor = '';
+                    
+                    // Show a success toast (visual only)
+                    const toast = document.createElement('div');
+                    toast.className = 'toast toast-success';
+                    toast.innerHTML = '<span>Changes saved successfully</span>';
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        toast.classList.add('show');
+                        
+                        setTimeout(() => {
+                            toast.classList.remove('show');
+                            setTimeout(() => {
+                                document.body.removeChild(toast);
+                            }, 300);
+                        }, 2000);
+                    }, 10);
+                    
+                }, 300);
+            });
+        });
+    </script>
+            
+            cancelBtn.addEventListener('click', function() {
+                // Show a cancel effect
+                this.style.backgroundColor = 'rgba(255, 100, 100, 0.2)';
+                this.style.borderColor = 'rgba(255, 100, 100, 0.4)';
+                
+                // Reset after animation
+                setTimeout(() => {
+                    this.style.backgroundColor = '';
+                    this.style.borderColor = '';
+                    contextInput.value = '';
+                    charCount.textContent = '0';
+                    charCount.parentElement.style.color = 'rgba(255, 255, 255, 0.5)';
+                }, 300);
+            });
+        
+        /* Modern FAQ styles */
+        .faq-container {
+            margin-bottom: 20px;
+        }
+        
+        .faq-heading, .support-heading {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .faq-item {
+            background: rgba(30, 30, 30, 0.4);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-question {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            transition: all 0.2s;
+        }
+        
+        .faq-question:hover {
+            background: rgba(40, 40, 40, 0.4);
+        }
+        
+        .faq-icon {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s;
+        }
+        
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 16px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding-bottom: 16px;
+        }
+        
+        .support-container {
+            background: rgba(30, 30, 30, 0.4);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .support-message {
+            min-height: 100px;
+        }
+        
+        .btn-send {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            background: rgba(60, 60, 60, 0.6);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        
+        .btn-send:hover {
+            background: rgba(70, 70, 70, 0.7);
+        }
+        
+        /* Context section footer updates */
+        .context-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .context-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(40, 40, 40, 0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-icon:hover {
+            background: rgba(50, 50, 50, 0.7);
+            transform: translateY(-2px);
+        }
+        
+        .btn-icon.btn-cancel {
+            color: rgba(255, 150, 150, 0.8);
+        }
+        
+        /* Modern FAQ styles */
+        .faq-container {
+            margin-bottom: 20px;
+        }
+        
+        .faq-heading, .support-heading {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .faq-item {
+            background: rgba(30, 30, 30, 0.4);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-question {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            transition: all 0.2s;
+        }
+        
+        .faq-question:hover {
+            background: rgba(40, 40, 40, 0.4);
+        }
+        
+        .faq-icon {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s;
+        }
+        
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 16px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding-bottom: 16px;
+        }
+        
+        .support-container {
+            background: rgba(30, 30, 30, 0.4);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .support-message {
+            min-height: 100px;
+        }
+        
+        .btn-send {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            background: rgba(60, 60, 60, 0.6);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        
+        .btn-send:hover {
+            background: rgba(70, 70, 70, 0.7);
+        }
+        
+        /* Context section footer updates */
+        .context-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .context-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(40, 40, 40, 0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-icon:hover {
+            background: rgba(50, 50, 50, 0.7);
+            transform: translateY(-2px);
+        }
+        
+        .btn-icon.btn-cancel {
+            color: rgba(255, 150, 150, 0.8);
+        }
+        
+        .btn-icon.btn-save {
+            color: rgba(150, 255, 150, 0.8);
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 6px;
+            padding: 10px 20px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .toast-success {
+            border-left: 3px solid rgba(100, 255, 100, 0.8);
+        }
+        
+        .toast-error {
+            border-left: 3px solid rgba(255, 100, 100, 0.8);
+        }
+        
+        /* Modern context section styles */
+        .context-container {
+            margin-bottom: 20px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .context-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .context-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .context-counter {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.2s ease;
+        }
+        
+        .context-input-wrapper {
+            position: relative;
+            border-radius: 8px;
+            background: rgba(30, 30, 30, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+        
+        .context-input-wrapper:focus-within {
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+        
+        .context-input {
+            width: 100%;
+            min-height: 100px;
+            background: transparent;
+            border: none;
+            padding: 12px 36px 12px 12px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+            resize: none;
+            z-index: 2;
+            position: relative;
+        }
+        
+        .context-input:focus {
+            outline: none;
+        }
+        
+        .context-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .context-decoration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0.03) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .context-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            z-index: 3;
+            transition: color 0.2s ease;
+        }
+        
+        .context-input-wrapper:hover .context-icon,
+        .context-input-wrapper:focus-within .context-icon {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .context-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .context-tag {
+            background: rgba(40, 40, 40, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 4px 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .context-tag:hover {
+            background: rgba(50, 50, 50, 0.8);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .context-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+        
+        .context-hint svg {
+            color: rgba(255, 255, 255, 0.4);
+            flex-shrink: 0;
+        }
+        
+        .btn-cancel {
+            background: rgba(30, 30, 30, 0.6);
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .btn-save {
+            background: rgba(50, 50, 50, 0.8);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            background-color: #1c1c1e; /* Apple dark mode background */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.85);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .settings-container {
+            width: 800px;
+            height: 500px;
+            background: #000000;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+            transition: box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        /* Apple-style container shadow on hover */
+        .settings-container:hover {
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
+        }
+
+        .settings-sidebar {
+            width: 180px;
+            background: #000000;
+            padding: 15px 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            text-align: center;
+            padding: 5px 15px 15px;
+        }
+
+        .logo-image {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        /* Upload animation */
+        .parsing-indicator {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .parsing-indicator.visible {
+            opacity: 1;
+        }
+
+        .parsing-indicator-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top-color: rgba(80, 200, 255, 0.8);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: spin 1s linear infinite;
+        }
+
+        .upload-status {
+            background: rgba(20, 24, 33, 0.7);
+            border-radius: 8px;
+            margin: 10px 0;
+            padding: 14px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 0px rgba(255, 120, 50, 0);
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-status.visible {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .upload-status.parsed {
+            animation: parsed-animation 2.8s ease forwards;
+        }
+        
+        @keyframes parsed-animation {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0px rgba(255, 120, 50, 0);
+            }
+            15% {
+                transform: scale(1.05);
+                box-shadow: 0 0 8px rgba(255, 120, 50, 0.3);
+            }
+            40% {
+                transform: scale(1.08);
+                box-shadow: 0 0 15px rgba(255, 120, 50, 0.7);
+            }
+            70% {
+                transform: scale(1.03);
+                box-shadow: 0 0 15px rgba(255, 120, 50, 0.7);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0px rgba(255, 120, 50, 0);
+            }
+        }
+        
+        .upload-status-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .upload-status-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: rgba(30, 150, 255, 0.2);
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        .upload-status-title {
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .upload-status-file {
+            margin-left: 4px;
+            padding: 2px 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .extraction-progress {
+            margin-top: 10px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .checkmark {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(100, 255, 100, 0.2);
+            color: rgba(100, 255, 100, 0.9);
+            text-align: center;
+            line-height: 14px;
+            font-size: 10px;
+            margin-left: 6px;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+        
+        .checkmark.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .success-pulse {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 120, 50, 0.2) 0%, rgba(255, 120, 50, 0) 70%);
+            opacity: 0;
+            z-index: 1;
+        }
+        
+        .success-pulse.animate {
+            animation: pulse 1.5s ease-out;
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(2);
+            }
+        }
+
+        .logo h2 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+
+        .nav-section {
+            margin-bottom: 15px;
+        }
+
+        .section-header {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            margin: 8px 0 5px 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .nav-item svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+            opacity: 0.8;
+        }
+
+        .shortcuts {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 10px;
+            margin-left: auto;
+        }
+
+        .settings-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 500px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .section-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .upload-area {
+            background: rgba(30, 30, 30, 0.4);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .upload-area:hover {
+            background: rgba(40, 40, 40, 0.4);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .upload-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .upload-text {
+            font-size: 15px;
+            font-weight: 400;
+            margin-bottom: 6px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(30, 30, 30, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-hint {
+            font-size: 11px;
+            margin-top: 4px;
+            color: rgba(255, 255, 255, 0.65); /* Increased contrast ratio */
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .toggle-title {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .toggle-hint {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 2px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 18px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .3s;
+            border-radius: 18px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 2px;
+            bottom: 2px;
+            background-color: rgba(255, 255, 255, 0.9);
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(18px);
+        }
+
+        .btn {
+            background: rgba(40, 40, 40, 0.5);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 14px;
+            border-radius: 8px; /* Standardized corner radius */
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Apple-style easing */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .btn:hover {
+            background: rgba(60, 60, 60, 0.5);
+            color: rgba(255, 255, 255, 1);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0px);
+            background: rgba(70, 70, 70, 0.5);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .settings-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .parsing-indicator {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .parsing-indicator-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top-color: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .context-area {
+            background: rgba(30, 30, 30, 0.4);
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 6px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Tab content styling */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Card styles */
+        .card {
+            background: rgba(30, 30, 30, 0.4);
+            border-radius: 10px; /* Standardized corner radius */
+            padding: 14px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .application-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(30, 30, 30, 0.4);
+            border-radius: 10px; /* Standardized corner radius */
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Apple-style easing */
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(8px);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 50%);
+            pointer-events: none;
+        }
+        
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(20, 20, 20, 0.5);
+            border-radius: 10px;
+            padding: 8px;
+        }
+        
+        .stat-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 3px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 0.5px;
+        }
+
+        .limit-indicator {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            margin-top: 12px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(8px);
+        }
+
+        .limit-progress {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(100, 200, 255, 0.7) 0%, rgba(150, 100, 255, 0.7) 100%);
+            width: 35%;
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .limit-progress-glow {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 20px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 100%);
+            animation: glow 1.5s infinite;
+        }
+        
+        @keyframes glow {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+            100% { opacity: 0.3; }
+        }
+        
+        .card-icon {
+            margin-right: 6px;
+            vertical-align: middle;
+            opacity: 0.7;
+        }
+        
+        .limit-badge {
+            background: rgba(100, 200, 255, 0.2);
+            color: rgba(100, 200, 255, 0.9);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .btn-outlined {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-outlined:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .activity-graph {
+            background: rgba(30, 30, 30, 0.4);
+            border-radius: 10px; /* Standardized corner radius */
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Tooltip styles for graph bars */
+        .graph-bar {
+            position: relative;
+        }
+        
+        .graph-bar::before {
+            content: attr(data-count);
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            opacity: 0;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            white-space: nowrap;
+            backdrop-filter: blur(8px);
+        }
+        
+        .graph-bar:hover::before {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+        
+        .graph-header {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+        }
+        
+        .graph-header::before {
+            content: "";
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.8)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='18' y1='20' x2='18' y2='10'%3E%3C/line%3E%3Cline x1='12' y1='20' x2='12' y2='4'%3E%3C/line%3E%3Cline x1='6' y1='20' x2='6' y2='14'%3E%3C/line%3E%3C/svg%3E");
+            background-size: contain;
+            margin-right: 8px;
+        }
+        
+        .graph-caption {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.65);
+            text-align: center;
+            margin-top: 24px;
+        }
+        
+        .graph-bars {
+            display: flex;
+            align-items: flex-end;
+            height: 60px;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .graph-bar {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .graph-bar:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scaleY(1.05);
+        }
+        
+        .graph-bar.active {
+            background: linear-gradient(180deg, rgba(100, 200, 255, 0.7) 0%, rgba(150, 100, 255, 0.7) 100%);
+        }
+        
+        .graph-date {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .limit-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .tab-badge {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            padding: 1px 5px;
+            font-size: 9px;
+            margin-left: 5px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+ 
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2); 
+        }
+
+        /* Personal info collapsible panel */
+        .personal-info-toggle {
+            cursor: pointer;
+            padding: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .personal-info-toggle span {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .personal-info-toggle .chevron {
+            transition: transform 0.3s;
+        }
+
+        .personal-info-toggle .chevron.down {
+            transform: rotate(180deg);
+        }
+
+        .personal-info-fields {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .personal-info-fields.expanded {
+            max-height: 300px;
+        }
+
+        .application-item {
+            margin-bottom: 10px;
+            padding: 14px;
+            border-radius: 10px; /* Standardized corner radius */
+            background: rgba(20, 20, 20, 0.3);
+            display: flex;
+            align-items: center;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Apple-style easing */
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .application-item:hover {
+            background: rgba(30, 30, 30, 0.5);
+        }
+        
+        .application-status {
+            margin-right: 12px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Accessibility enhancement: add patterns for colorblind users */
+        .status-applied {
+            background: rgba(100, 200, 255, 0.8);
+            box-shadow: 0 0 8px rgba(100, 200, 255, 0.4);
+        }
+        
+        .status-applied::after {
+            content: "";
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .status-interview {
+            background: rgba(255, 180, 100, 0.8);
+            box-shadow: 0 0 8px rgba(255, 180, 100, 0.4);
+        }
+        
+        .status-interview::after {
+            content: "";
+            width: 6px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .status-offer {
+            background: rgba(100, 255, 150, 0.8);
+            box-shadow: 0 0 8px rgba(100, 255, 150, 0.4);
+        }
+        
+        .status-offer::after {
+            content: "";
+            width: 4px;
+            height: 4px;
+            transform: rotate(45deg);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .application-content {
+            flex: 1;
+        }
+
+        .application-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 4px;
+        }
+
+        .application-company, .application-date {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.65); /* Increased contrast ratio */
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .application-actions {
+            margin-left: 10px;
+        }
+        
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Additional styling for a more minimalist look */
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            padding-right: 28px;
+        }
+
+        textarea.form-control {
+            min-height: 70px;
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-sidebar">
+            <div class="logo">
+                <img src="https://github.com/ashwin-2001/PandemicControl-AI/blob/main/IconSnap.jpg?raw=true" alt="SnapPhil Logo" class="logo-image">
+                <h2>SnapPhil</h2>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-item active" data-tab="profile">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>Profile</span>
+                </div>
+                <div class="nav-item" data-tab="applications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                    <span>Applications</span>
+                    <span class="tab-badge">3</span>
+                </div>
+                <div class="nav-item" data-tab="coverletter">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>Cover Letter</span>
+                </div>
+                <div class="nav-item" data-tab="advanced">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>Advanced</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="section-header">Settings</div>
+                <div class="nav-item" data-tab="privacy">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span>Privacy</span>
+                </div>
+                <div class="nav-item" data-tab="help">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span>Help & Support</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-content">
+            <!-- Profile Tab -->
+            <div id="profile" class="tab-content active">
+                <h2 class="section-title">Profile Settings</h2>
+                <p class="section-subtitle">Update your profile information to improve job application filling accuracy</p>
+
+                <div class="upload-area" id="resumeUpload">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <div class="upload-text">Upload Your Resume</div>
+                    <div class="upload-hint">Drag and drop your PDF resume or click to browse</div>
+                    <input type="file" id="resume-file-input" accept=".pdf,.doc,.docx" style="display:none">
+                </div>
+
+                <div class="parsing-indicator">
+                    <div class="parsing-indicator-spinner"></div>
+                    <span>Analyzing your resume...</span>
+                </div>
+                
+                <div class="upload-status" id="upload-status">
+                    <div class="success-pulse" id="success-pulse"></div>
+                    <div class="upload-status-content">
+                        <div class="upload-status-title">
+                            <div class="upload-status-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="rgba(80, 200, 255, 0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                    <polyline points="13 2 13 9 20 9"></polyline>
+                                </svg>
+                            </div>
+                            Resume uploaded:
+                            <div class="upload-status-file" id="file-name">resume.pdf</div>
+                        </div>
+                        <div class="extraction-progress">
+                            <div id="extraction-status">• Extracting work experience</div>
+                            <div id="parsed-status" style="display:none">
+                                • Resume successfully parsed <span class="checkmark" id="success-check">✓</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="personal-info-toggle">
+                    <span>Personal Information (Optional)</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                
+                <div class="personal-info-fields">
+                    <div class="form-group">
+                        <label class="form-label">Full Name (Optional)</label>
+                        <input type="text" class="form-control" placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address (Optional)</label>
+                        <input type="email" class="form-control" placeholder="Enter your email address">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Phone Number (Optional)</label>
+                        <input type="tel" class="form-control" placeholder="Enter your phone number">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">LinkedIn Profile URL (Optional)</label>
+                        <input type="url" class="form-control" placeholder="https://linkedin.com/in/your-profile">
+                    </div>
+                </div>
+
+                <div class="context-container">
+                    <div class="context-header">
+                        <label class="context-label">Additional Context</label>
+                        <div class="context-counter"><span id="char-count">0</span>/500</div>
+                    </div>
+                    <div class="context-input-wrapper">
+                        <textarea class="context-input" placeholder="Add any additional details not in your resume (e.g., work authorization status, special instructions for AI)"></textarea>
+                        <div class="context-decoration"></div>
+                        <div class="context-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="context-tags">
+                        <div class="context-tag" data-tag="Work authorization">Work authorization</div>
+                        <div class="context-tag" data-tag="Freelance availability">Freelance availability</div>
+                        <div class="context-tag" data-tag="Relocation preferences">Relocation preferences</div>
+                    </div>
+                    <div class="context-footer">
+                        <div class="context-hint">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 8v4"></path>
+                                <path d="M12 16h.01"></path>
+                            </svg>
+                            <span>This information will help our AI better understand your background and preferences</span>
+                        </div>
+                        <div class="context-actions">
+                            <button class="btn-icon btn-cancel">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                            <button class="btn-icon btn-save">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Applications Tab -->
+            <div id="applications" class="tab-content">
+                <h2 class="section-title">Application History</h2>
+                <p class="section-subtitle">Track and manage your job applications</p>
+
+                <div class="application-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="rgba(100, 255, 255, 0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                                <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                                <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Applied</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255, 180, 100, 0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="4" y="5" width="16" height="16" rx="2"></rect>
+                                <path d="M16 3v4"></path>
+                                <path d="M8 3v4"></path>
+                                <path d="M4 11h16"></path>
+                                <path d="M10 16h4"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Interviews</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="rgba(100, 255, 150, 0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                <path d="M2 17l10 5 10-5"></path>
+                                <path d="M2 12l10 5 10-5"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">1</div>
+                            <div class="stat-label">Offers</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" class="card-icon">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Daily Application Limit
+                        </div>
+                        <div class="limit-badge">35%</div>
+                    </div>
+                    <div class="limit-indicator">
+                        <div class="limit-progress">
+                            <div class="limit-progress-glow"></div>
+                        </div>
+                    </div>
+                    <div class="limit-text">
+                        <span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+                                <path d="M5 12h14"></path>
+                                <path d="M12 5v14"></path>
+                            </svg>
+                            7 applications used today
+                        </span>
+                        <span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                            20 applications available
+                        </span>
+                    </div>
+                    <div class="form-hint">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        Your daily limit resets at midnight UTC
+                    </div>
+                </div>
+
+                <div class="activity-graph">
+                    <div class="graph-header">Application Activity</div>
+                    <div class="graph-bars">
+                        <div class="graph-bar" style="height: 30%" data-count="3 applications"><span class="graph-date">15</span></div>
+                        <div class="graph-bar" style="height: 50%" data-count="5 applications"><span class="graph-date">16</span></div>
+                        <div class="graph-bar" style="height: 20%" data-count="2 applications"><span class="graph-date">17</span></div>
+                        <div class="graph-bar" style="height: 80%" data-count="8 applications"><span class="graph-date">18</span></div>
+                        <div class="graph-bar" style="height: 45%" data-count="4 applications"><span class="graph-date">19</span></div>
+                        <div class="graph-bar active" style="height: 35%" data-count="3 applications"><span class="graph-date">20</span></div>
+                        <div class="graph-bar" style="height: 10%" data-count="1 application"><span class="graph-date">21</span></div>
+                    </div>
+                    <div class="graph-caption">April 15-21, 2025</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" class="card-icon">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            Recent Applications
+                        </div>
+                        <button class="btn btn-outlined">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                            View All
+                        </button>
+                    </div>
+                    <div class="recent-applications">
+                        <div class="application-item">
+                            <div class="application-status">
+                                <span class="status-dot status-applied"></span>
+                            </div>
+                            <div class="application-content">
+                                <div class="application-title">UX Designer</div>
+                                <div class="application-company">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                    </svg>
+                                    Google, Inc.
+                                </div>
+                                <div class="application-date">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    Applied on April 18, 2025
+                                </div>
+                            </div>
+                            <div class="application-actions">
+                                <button class="action-btn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                                        <circle cx="12" cy="12" r="1"></circle>
+                                        <circle cx="19" cy="12" r="1"></circle>
+                                        <circle cx="5" cy="12" r="1"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cover Letter Tab -->
+            <div id="coverletter" class="tab-content">
+                <h2 class="section-title">Cover Letter Settings</h2>
+                <p class="section-subtitle">Customize how your AI-generated cover letters are created</p>
+
+                <div class="form-group">
+                    <label class="form-label">Cover Letter Style</label>
+                    <select class="form-control">
+                        <option>Professional (Standard)</option>
+                        <option>Creative & Bold</option>
+                        <option>Academic & Formal</option>
+                        <option>Concise & Direct</option>
+                    </select>
+                    <div class="form-hint">This affects the tone and structure of your generated cover letters</div>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Include Specific Achievements</div>
+                        <div class="toggle-hint">Highlight quantifiable results and achievements</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Mention Company Research</div>
+                        <div class="toggle-hint">Show your knowledge of the company and its mission</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Include Salary Expectations</div>
+                        <div class="toggle-hint">Only if requested in job description</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Custom Closing Statement</label>
+                    <textarea class="form-control" rows="3" placeholder="Optional: Add your preferred closing statement"></textarea>
+                    <div class="form-hint">Leave blank to use our AI-generated closing</div>
+                </div>
+
+                <div class="settings-footer">
+                    <button class="btn">Reset to Default</button>
+                    <button class="btn">Save Changes</button>
+                </div>
+            </div>
+
+            <!-- Advanced Tab -->
+            <div id="advanced" class="tab-content">
+                <h2 class="section-title">Advanced Settings</h2>
+                <p class="section-subtitle">Fine-tune how SnapPhil works</p>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Auto-Fill Optional Fields</div>
+                        <div class="toggle-hint">Fill all fields including those marked as optional</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Enhanced Job Matching</div>
+                        <div class="toggle-hint">Tailors responses to better match job descriptions</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Autosave Applications</div>
+                        <div class="toggle-hint">Track applications even if not submitted</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">AI Personality</label>
+                    <select class="form-control">
+                        <option>Professional (Default)</option>
+                        <option>Enthusiastic</option>
+                        <option>Technical</option>
+                        <option>Creative</option>
+                    </select>
+                    <div class="form-hint">Affects tone of generated content</div>
+                </div>
+
+                <div class="settings-footer">
+                    <button class="btn">Reset All Settings</button>
+                    <button class="btn">Save Changes</button>
+                </div>
+            </div>
+
+            <!-- Privacy Tab -->
+            <div id="privacy" class="tab-content">
+                <h2 class="section-title">Privacy Settings</h2>
+                <p class="section-subtitle">Control how your data is used and stored</p>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Store Resume Data Locally</div>
+                        <div class="toggle-hint">Keep resume data on your device only</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Allow Anonymous Usage Analytics</div>
+                        <div class="toggle-hint">Help us improve SnapPhil (no personal data shared)</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-container">
+                    <div>
+                        <div class="toggle-title">Store Application History</div>
+                        <div class="toggle-hint">Track which jobs you've applied to</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Data Management</div>
+                    </div>
+                    <button class="btn btn-block" style="margin-bottom: 8px;">Export My Data</button>
+                    <button class="btn btn-block" style="color: rgba(255, 80, 80, 0.9);">Delete All My Data</button>
+                </div>
+
+                <div class="settings-footer">
+                    <button class="btn">Save Changes</button>
+                </div>
+            </div>
+
+            <!-- Help Tab -->
+            <div id="help" class="tab-content">
+                <h2 class="section-title">Help & Support</h2>
+                <p class="section-subtitle">Get assistance with using SnapPhil</p>
+
+                <div class="faq-container">
+                    <h3 class="faq-heading">Frequently Asked Questions</h3>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>How does SnapPhil protect my data?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p>SnapPhil takes data security seriously. All your personal information and resume data are encrypted and securely stored. We never sell your data to third parties and only use it to improve your job application experience. You can delete your data at any time from the Privacy settings.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Can I use SnapPhil on mobile devices?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Currently, SnapPhil is only available as a Chrome extension for desktop browsers. We're actively working on mobile support and will notify users when it becomes available. For the best experience, please use SnapPhil on a desktop or laptop computer.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>How do I know when my daily limit resets?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Your daily application limit resets at midnight UTC every day. You can view your current usage and remaining quota on the Applications tab. The system automatically refreshes your available applications at the reset time without any action needed from you.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Can I edit an auto-filled application?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes, you can always edit any field after SnapPhil auto-fills it. Simply click on any filled field to modify the content. Your changes won't affect future auto-fills unless you update your profile information in the settings.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="support-container">
+                    <h3 class="support-heading">Contact Support</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-control" placeholder="What can we help you with?">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control support-message" placeholder="Describe your issue or question"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-send">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        <span>Send Message</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabItems = document.querySelectorAll('.nav-item');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabItems.forEach(tab => tab.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // Resume upload functionality
+            const resumeUpload = document.getElementById('resumeUpload');
+            const fileInput = document.getElementById('resume-file-input');
+            const parsingIndicator = document.querySelector('.parsing-indicator');
+            const uploadStatus = document.getElementById('upload-status');
+            const fileName = document.getElementById('file-name');
+            const extractionStatus = document.getElementById('extraction-status');
+            
+            // Show file picker when clicking the upload area
+            resumeUpload.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // Handle file selection
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    
+                    // Show the file name and the parsing indicator
+                    fileName.textContent = file.name;
+                    parsingIndicator.classList.add('visible');
+                    
+                    // Reset any previous animations
+                    uploadStatus.classList.remove('parsed');
+                    document.getElementById('success-pulse').classList.remove('animate');
+                    document.getElementById('success-check').classList.remove('visible');
+                    document.getElementById('parsed-status').style.display = 'none';
+                    document.getElementById('extraction-status').style.display = 'block';
+                    
+                    // Show upload status
+                    setTimeout(() => {
+                        uploadStatus.classList.add('visible');
+                        extractionStatus.textContent = '• Extracting work experience';
+                        
+                        // Start parsing simulation
+                        setTimeout(() => {
+                            extractionStatus.textContent = '• Identifying skills and qualifications';
+                            
+                            setTimeout(() => {
+                                extractionStatus.textContent = '• Analyzing education history';
+                                
+                                // Final success state
+                                setTimeout(() => {
+                                    // Hide the extraction status and show success message
+                                    document.getElementById('extraction-status').style.display = 'none';
+                                    document.getElementById('parsed-status').style.display = 'block';
+                                    
+                                    // Add the parsed animation class
+                                    uploadStatus.classList.add('parsed');
+                                    
+                                    // Animate the success pulse
+                                    document.getElementById('success-pulse').classList.add('animate');
+                                    
+                                    // Show the checkmark
+                                    setTimeout(() => {
+                                        document.getElementById('success-check').classList.add('visible');
+                                    }, 700);
+                                    
+                                    // Hide the parsing indicator
+                                    parsingIndicator.classList.remove('visible');
+                                }, 500);
+                            }, 500);
+                        }, 500);
+                    }, 300);
+                }
+            });
+            
+            // Drag and drop functionality
+            resumeUpload.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.background = 'rgba(50, 50, 50, 0.5)';
+                this.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            });
+            
+            resumeUpload.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.background = 'rgba(30, 30, 30, 0.4)';
+                this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            });
+            
+            resumeUpload.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.background = 'rgba(30, 30, 30, 0.4)';
+                this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    fileInput.files = e.dataTransfer.files;
+                    const event = new Event('change', { bubbles: true });
+                    fileInput.dispatchEvent(event);
+                }
+            });
+            
+            // Personal info toggle
+            const personalInfoToggle = document.querySelector('.personal-info-toggle');
+            const personalInfoFields = document.querySelector('.personal-info-fields');
+            const chevron = document.querySelector('.chevron');
+            
+            personalInfoToggle.addEventListener('click', function() {
+                personalInfoFields.classList.toggle('expanded');
+                chevron.classList.toggle('down');
+            });
+            
+            // Context area interactivity
+            const contextInput = document.querySelector('.context-input');
+            const charCount = document.getElementById('char-count');
+            const contextTags = document.querySelectorAll('.context-tag');
+            
+            // Character counter
+            contextInput.addEventListener('input', function() {
+                const length = this.value.length;
+                charCount.textContent = length;
+                
+                // Change color if approaching limit
+                if (length > 400) {
+                    charCount.parentElement.style.color = 'rgba(255, 180, 0, 0.8)';
+                } else if (length > 480) {
+                    charCount.parentElement.style.color = 'rgba(255, 100, 100, 0.8)';
+                } else {
+                    charCount.parentElement.style.color = 'rgba(255, 255, 255, 0.5)';
+                }
+                
+                // Auto resize textarea
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            // Quick tag insertion
+            contextTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    const tagText = this.getAttribute('data-tag');
+                    contextInput.value += (contextInput.value ? '\n' : '') + tagText + ': ';
+                    contextInput.focus();
+                    
+                    // Trigger input event to update character count
+                    const event = new Event('input', {
+                        bubbles: true,
+                        cancelable: true,
+                    });
+                    contextInput.dispatchEvent(event);
+                });
+            });
+            
+            // Smooth focus animation
+            contextInput.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+            
+            contextInput.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+            
+            // FAQ accordion functionality
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                
+                question.addEventListener('click', () => {
+                    // Toggle active class on the clicked item
+                    const isActive = item.classList.contains('active');
+                    
+                    // Close all FAQ items first
+                    faqItems.forEach(faq => {
+                        faq.classList.remove('active');
+                    });
+                    
+                    // If the clicked item wasn't active, open it
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

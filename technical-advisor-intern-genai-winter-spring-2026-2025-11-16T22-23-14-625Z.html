@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ASHWIN A. SHARMA — Resume</title>
+  <style>
+    @page { size: 8.5in 11in; margin: 0.5in; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Garamond', 'Times New Roman', serif;
+      font-size: 11pt;
+      color: #000;
+      line-height: 1.15;
+      max-width: 8.5in;
+      margin: 0 auto;
+      padding: 0.5in;
+      background: #fff;
+    }
+    .header-name {
+      font-size: 20pt;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 4pt;
+    }
+    .header-contact {
+      font-size: 9pt;
+      text-align: center;
+      margin-bottom: 4pt;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 2pt 14pt;
+      line-height: 1.35;
+      white-space: normal;
+    }
+    .header-contact span {
+      position: relative;
+      padding-right: 10pt;
+      text-transform: none;
+    }
+    .header-contact.multi-line span::after {
+      content: "•";
+      position: absolute;
+      right: 2pt;
+    }
+    .header-contact.multi-line span:last-child::after {
+      content: "";
+    }
+    .header-note {
+      font-size: 9pt;
+      font-style: italic;
+      text-align: center;
+      margin-bottom: 8pt;
+    }
+    .section { margin-bottom: 8pt; }
+    .section-title {
+      font-size: 11pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid #000;
+      padding-bottom: 1pt;
+      margin: 6pt 0 4pt 0;
+    }
+    .two-col { display: flex; gap: 8pt; }
+    .two-col > div { flex: 1; }
+    .exp-item, .proj-item, .skill-group, .edu-item, .pub-item { margin-bottom: 6pt; }
+    .exp-item strong:first-child,
+    .proj-item strong:first-child {
+      display: block;
+      font-weight: 700;
+      font-size: 11pt;
+      margin-bottom: 2pt;
+    }
+    .exp-header, .edu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 2pt;
+    }
+    .exp-title { font-weight: 700; font-size: 11pt; }
+    .exp-meta { font-size: 10pt; font-style: italic; white-space: nowrap; }
+    ul { margin: 0 0 0 18pt; padding: 0; list-style-position: outside; }
+    li { margin-bottom: 2pt; font-size: 10pt; line-height: 1.25; }
+    .skills-row {
+      list-style-type: disc;
+      margin: 0 0 0 16pt;
+      padding: 0;
+      font-size: 10pt;
+      display: block;
+      column-gap: 0;
+      row-gap: 0;
+    }
+    .skills-row li {
+      margin-bottom: 2pt;
+      line-height: 1.15;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-name">ASHWIN A. SHARMA</div>
+  <div class="header-contact">
+    <span>+1 929-245-5681</span>
+    <span>sharmaashwin4000@gmail.com</span>
+    <span>github.com/ashwin-2001</span>
+    <span>linkedin.com/in/ashwinsharma2001</span>
+  </div>
+  <div class="header-note">F-1 (NYU) CPT eligible Fall 2025/2026 • NYC/Remote</div>
+
+  <div class="section">
+    <div class="section-title">PROFESSIONAL EXPERIENCE</div>
+
+    <div class="exp-item">
+      <div class="exp-header">
+        <div class="exp-title"><strong>Senior Machine Learning Engineer, ViaLYTICS Consulting</strong></div>
+        <div class="exp-meta">Aug 2022–Apr 2023 • Remote</div>
+      </div>
+      <ul>
+        <li>Developed reinforcement learning autoscaler (PPO/DQN) with real-time feedback loops, cutting AWS EC2 idle spend by 19%</li>
+        <li>Deployed computer vision system (Faster R-CNN + OpenCV) for traffic monitoring at 18 FPS, 97% precision; processed millions of frames with distributed inference</li>
+        <li>Designed production-grade portfolio optimizer using PyTorch + RLlib (Sharpe 0.99, +80% backtested annual return) with REST API for deployment at scale</li>
+        <li>Applied software engineering best practices: CI/CD, containerization, and distributed deep learning training</li>
+      </ul>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-header">
+        <div class="exp-title"><strong>Founding ML Engineer &amp; Tech Lead, Nextap AI</strong></div>
+        <div class="exp-meta">Apr 2023–Jul 2024</div>
+      </div>
+      <ul>
+        <li>Led ML engineering team delivering 300+ AI projects across planning, generative modeling, and reinforcement learning domains</li>
+        <li>Published Android app Artific AI (1,500+ installs, 100+ DAU) showcasing foundation-model integration for text, image, and code</li>
+        <li>Collaborated on imitation learning prototypes for sequential decision-making and policy alignment in applied robotics contexts</li>
+      </ul>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-header">
+        <div class="exp-title"><strong>Founding ML Engineer, Nextap AI</strong></div>
+        <div class="exp-meta">Sep 2021–Aug 2022 • Mumbai, India</div>
+      </div>
+      <ul>
+        <li>Bootstrapped AI platform to five-figure USD revenue in 6 months; launched Codilarity.com used by 2,000+ developers</li>
+        <li>Delivered 120+ ML proofs-of-concept including reinforcement learning and computer vision pipelines relevant to autonomous systems</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="section">
+    <div class="section-title">KEY PROJECTS IN GENERATIVE AI &amp; RL</div>
+
+    <div class="proj-item">
+      <strong>Autonomous Driving Simulator + RL Agent — Python, RLlib, Pygame</strong>
+      <ul>
+        <li>Developed end-to-end driving simulator with LiDAR, convex-hull procedural tracks, and collision detection</li>
+        <li>Trained PPO and DQN policies; PPO achieved +160% higher reward and 94% generalization to unseen environments</li>
+        <li>Packaged as pip module now supporting NYU reinforcement learning research labs</li>
+      </ul>
+    </div>
+
+    <div class="proj-item">
+      <strong>Generative + Imitation Learning for Robotics (RAG Assistant for ROS2) — TensorFlow, Hugging Face</strong>
+      <ul>
+        <li>Fine-tuned 4-bit LLM with 1,700+ robotics-specific instructions for imitation learning, cutting development time by 40%</li>
+        <li>Implemented vector database retrieval with &lt; 500ms latency and 95% task success for robot planning queries</li>
+      </ul>
+    </div>
+
+    <div class="proj-item">
+      <strong>Pandemic Policy Simulator with RL — NumPy, RLlib</strong>
+      <ul>
+        <li>Built scalable environment using vectorized NumPy ops for 700× faster simulation (700ms → 1ms/frame)</li>
+        <li>Trained DQN/PPO agents replicating sequential policy logic with 87% fidelity; published at IEEE ICCSAI ’23</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="section">
+    <div class="section-title">TECHNICAL SKILLS</div>
+
+    <div class="skill-group">
+      <ul class="skills-row">
+        <li>Reinforcement Learning: PPO, DQN, Imitation Learning, End-to-End Driving Models</li>
+        <li>Generative Modeling &amp; LLMs: Fine-tuning, Hugging Face, RAG, Model Alignment</li>
+        <li>Languages: Python, C++, JavaScript/TypeScript, SQL</li>
+        <li>Deep Learning: PyTorch, TensorFlow, Hugging Face</li>
+        <li>Distributed Systems: AWS EC2/S3/CloudWatch, Docker, GitHub Actions</li>
+        <li>Computer Vision: OpenCV, Faster R-CNN, Multi-camera pipelines</li>
+        <li>Databases &amp; Tools: MongoDB, PostgreSQL (basic), Linux, Bash, pandas, pytest</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="section two-col">
+    <div>
+      <div class="section-title">EDUCATION</div>
+
+      <div class="edu-item">
+        <div class="edu-header">
+          <div><strong>New York University</strong></div>
+          <div class="exp-meta">Sep 2024–May 2026</div>
+        </div>
+        <div>MS Computer Science • GPA: 3.77/4.00</div>
+      </div>
+
+      <div class="edu-item">
+        <div class="edu-header">
+          <div><strong>University of Mumbai</strong></div>
+          <div class="exp-meta">2019–2023</div>
+        </div>
+        <div>BE Computer Engineering • CGPA: 8.21/10</div>
+      </div>
+
+    </div>
+    <div>
+      <div class="section-title">PUBLICATIONS</div>
+
+      <div class="pub-item">
+        <div><strong>IEEE ICCSAI ’23</strong></div>
+        <div>Reinforcement-Learning-Driven Pandemic Policy Simulator, IEEE Xplore.</div>
+      </div>
+
+      <div class="pub-item">
+        <div><strong>IEEE IBSSC ’22</strong></div>
+        <div>Statistical Data Analysis using GPT-3, doi: 10.1109/IBSSC56953.2022.10037383.</div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

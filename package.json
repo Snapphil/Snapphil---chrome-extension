@@ -1,0 +1,23 @@
+{
+  "name": "jobapplicationautomator",
+  "version": "1.0.0",
+  "description": "This document summarizes the implementation of cover letter settings for the SnapPhil AI Job Application Assistant extension.",
+  "main": "auth.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "latex:demo": "node scripts/testLatexConverter.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "html-to-docx": "^1.8.0",
+    "hyphenation.en-us": "^0.2.1",
+    "latex.js": "^0.12.6",
+    "puppeteer": "^24.30.0",
+    "svgdom": "^0.1.22"
+  }
+}

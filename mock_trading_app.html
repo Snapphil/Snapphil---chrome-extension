@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Trading App - BTCUSDT Perpetual</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #app {
+            width: 90%;
+            max-width: 1200px;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #252525;
+        }
+        header span {
+            margin-right: 20px;
+        }
+        .tabs button {
+            background: none;
+            border: none;
+            color: #ffffff;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .tabs button:hover {
+            text-decoration: underline;
+        }
+        .chart-container {
+            height: 400px;
+            padding: 20px;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+        }
+        .trade-panel {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #252525;
+        }
+        .trade-panel div {
+            margin: 10px 0;
+        }
+        input {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: #fff;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        button.short {
+            background-color: #f44336;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <span>BTCUSDT Perpetual</span>
+            <span>Last Price: <span id="price">60000</span></span>
+            <span>24h Change: 0.5%</span>
+            <span>24h High: 60500</span>
+            <span>24h Low: 59500</span>
+            <div class="tabs">
+                <button>Chart</button>
+                <button>Trade</button>
+                <button>Info</button>
+                <button>Data</button>
+                <button>Audit</button>
+            </div>
+        </header>
+        <div class="chart-container">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="trade-panel">
+            <div>Balance: <span id="usdt-balance">100000</span> USDT</div>
+            <div>BTC Position: <span id="btc-position">0</span></div>
+            <div>PNL: <span id="pnl">0</span> USDT</div>
+            <div>Current Price: <span id="current-price">60000</span></div>
+            <input type="number" id="amount" placeholder="Amount USDT" min="1">
+            <button onclick="trade('long')">Long</button>
+            <button class="short" onclick="trade('short')">Short</button>
+        </div>
+    </div>
+    <script>
+        let usdtBalance = 100000;
+        let position = 0; // positive for long, negative for short
+        let entryPrice = 0;
+        let currentPrice = 60000;
+
+        // Mock candle data
+        let candles = [];
+        for (let i = 0; i < 50; i++) {
+            let open = currentPrice + Math.random() * 100 - 50;
+            let close = open + Math.random() * 100 - 50;
+            let high = Math.max(open, close) + Math.random() * 50;
+            let low = Math.min(open, close) - Math.random() * 50;
+            candles.push({open, high, low, close, volume: Math.random() * 1000});
+            currentPrice = close;
+        }
+
+        const canvas = document.getElementById('chart');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = canvas.offsetWidth;
+        let height = canvas.height = canvas.offsetHeight;
+
+        function drawChart() {
+            ctx.clearRect(0, 0, width, height);
+            const maxPrice = Math.max(...candles.map(c => c.high));
+            const minPrice = Math.min(...candles.map(c => c.low));
+            const priceRange = maxPrice - minPrice;
+            const candleWidth = width / candles.length - 2;
+
+            candles.forEach((candle, i) => {
+                const x = i * (candleWidth + 2);
+                const yHigh = height - ((candle.high - minPrice) / priceRange) * height * 0.8;
+                const yLow = height - ((candle.low - minPrice) / priceRange) * height * 0.8;
+                const yOpen = height - ((candle.open - minPrice) / priceRange) * height * 0.8;
+                const yClose = height - ((candle.close - minPrice) / priceRange) * height * 0.8;
+
+                // Wick
+                ctx.beginPath();
+                ctx.moveTo(x + candleWidth / 2, yHigh);
+                ctx.lineTo(x + candleWidth / 2, yLow);
+                ctx.strokeStyle = '#ffffff';
+                ctx.stroke();
+
+                // Body
+                ctx.fillStyle = candle.close > candle.open ? '#4caf50' : '#f44336';
+                ctx.fillRect(x, Math.min(yOpen, yClose), candleWidth, Math.abs(yClose - yOpen));
+
+                // Volume (bottom 20%)
+                const volHeight = (candle.volume / 1000) * height * 0.2;
+                ctx.fillStyle = '#ffffff33';
+                ctx.fillRect(x, height - volHeight, candleWidth, volHeight);
+            });
+
+            // Horizontal line (like in image)
+            const avgPrice = (maxPrice + minPrice) / 2;
+            const yAvg = height - ((avgPrice - minPrice) / priceRange) * height * 0.8;
+            ctx.beginPath();
+            ctx.moveTo(0, yAvg);
+            ctx.lineTo(width, yAvg);
+            ctx.strokeStyle = '#0000ff';
+            ctx.stroke();
+        }
+
+        drawChart();
+
+        // Simulate price updates
+        setInterval(() => {
+            currentPrice += Math.random() * 200 - 100;
+            document.getElementById('price').textContent = currentPrice.toFixed(2);
+            document.getElementById('current-price').textContent = currentPrice.toFixed(2);
+
+            // Update PNL
+            if (position !== 0) {
+                const pnl = position * (currentPrice - entryPrice);
+                document.getElementById('pnl').textContent = pnl.toFixed(2);
+            }
+
+            // Update last candle
+            let last = candles[candles.length - 1];
+            last.close = currentPrice;
+            last.high = Math.max(last.high, currentPrice);
+            last.low = Math.min(last.low, currentPrice);
+            drawChart();
+        }, 1000);
+
+        function trade(type) {
+            const amount = parseFloat(document.getElementById('amount').value);
+            if (isNaN(amount) || amount <= 0 || amount > usdtBalance) {
+                alert('Invalid amount');
+                return;
+            }
+
+            // Simple mock: assume 1x leverage, position size in BTC = amount / currentPrice
+            const size = amount / currentPrice;
+            if (type === 'long') {
+                position += size;
+            } else {
+                position -= size;
+            }
+            usdtBalance -= amount; // Margin used
+            entryPrice = currentPrice; // Simplified, reset entry for new trade
+
+            document.getElementById('usdt-balance').textContent = usdtBalance.toFixed(2);
+            document.getElementById('btc-position').textContent = position.toFixed(4);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+For first time users:
+Visit link https://chromewebstore.google.com/detail/SnapPhil%20-%20AI%20Job%20Application%20Assistant/meeggjlhfjliakcccgcjlddpblcedlml?hl=en on desktop
+
+-Add to chrome
+- Visit a job site
+- Open the extension by clicking extension
+- It will popup on page
+- Go to Settings > signin > create account > close the extension by clicking on page
+- Reopen the extension, it will work
+- Add your details like resume pdf, name and other details by clicking on edit option on first tab, save.
+- Tap autofill. A small overlay will come in center bottom of page that will send request to AI along with your details and Job listing text available on page. And in 20 - 40 seconds it will start filling the form
+- It only works for single page Job application. If multiple pages it will still fill the visible section but you will need to run this for all sections by clicking next on job page.
+
+For recurrent users:
+- Visit the job page
+- Open SnapPhil extension
+- This extension keeps a track of your job applications where you successfully applied using it. You can toggle Applied, Rejected, Offer for your own reference later. Even the cover letter be available to download as pdf if you ever applied to a job that had cover letter generation
+- Context dump feature: This allows user to give any additional details that weren't mentioned in resume. User can also instruct extension for eg: Fill optional details as well, etc
+Immigrants can mention laws even though AI will try to estimate it based on resume and even name.
+- Each user has a dynamic range of applications everyday as per server load. it's a limit to provide service to all users Or can defer based on the plan user is on with SnapPhil
+
+
+How it works?
+Scans the page > send data to AI > AI give out appropriate values > extension fill it live in front of user
+
+What data we store?
+Resume, AI generated cover letters (For users to track), User details whatever user gives in context dump, Jobs user has applied.
+As this is important to accurately fill the applications
+
+There are 4 tabs in popup mentioned above
+
+For beta usage this server works by estimating how many users are there and how many applications can we fill each day for users (900 approximately) every day combined for all users.

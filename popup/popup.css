@@ -1,0 +1,108 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #1c1e26;
+  color: #e3e3e3;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.container {
+  width: 260px;
+  padding: 10px;
+}
+
+.btn-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.autofill-btn {
+  background: linear-gradient(90deg, #f0a830, #d89726);
+  color: #1c1e26;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  position: relative;
+}
+
+.autofill-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(240, 168, 48, 0.3);
+}
+
+.autofill-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(240, 168, 48, 0.2);
+}
+
+.settings-btn {
+  background: rgba(40, 40, 40, 0.5);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-btn:hover {
+  background: rgba(60, 60, 60, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.settings-btn:active {
+  transform: translateY(0);
+  background: rgba(70, 70, 70, 0.5);
+}
+
+.settings-btn i {
+  font-size: 16px;
+}
+
+/* Disabled button styles */
+.autofill-btn.disabled {
+  opacity: 0.7;
+  background: linear-gradient(90deg, #a88b3b, #a27e2a);
+  cursor: not-allowed;
+  transition: none;
+}
+
+.autofill-btn.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.warning-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ff453a;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
