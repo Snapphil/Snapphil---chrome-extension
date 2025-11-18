@@ -2694,6 +2694,16 @@
          showSlidingStatus("Resume uploaded successfully", "success", 25, "init");
        }
        
+       // Attach resume customization panel if not already mounted (for side-by-side operation)
+       if (!resumePreviewState.mounted) {
+         try {
+           attachResumePreviewPanel();
+           logSystem.info("Resume customization panel attached for side-by-side operation");
+         } catch (error) {
+           logSystem.warning(`Could not attach resume panel: ${error.message}`);
+         }
+       }
+
        // Detect form elements
        showSlidingStatus("Analyzing page content...", "progress", 15, "detect");
        const formElements = detectFormElements();
@@ -5320,8 +5330,22 @@ function clearStoredResumePreview() {
     }
 
     const selectedFormat = resumePreviewState.selectedFormat || 'txt';
+
+    // Ask for upload permission before proceeding
+    const uploadConfirmed = confirm(
+      `Do you want to download and upload your ${selectedFormat.toUpperCase()} resume to this page?\n\n` +
+      `This will:\n` +
+      `1. Download the resume to your computer\n` +
+      `2. Automatically upload it to the resume field on this page`
+    );
+
+    if (!uploadConfirmed) {
+      console.log('[Resume Developer] User canceled upload');
+      return;
+    }
+
     resumePreviewState.acceptInFlight = true;
-    
+
     if (resumePreviewState.elements?.acceptBtn) {
       resumePreviewState.elements.acceptBtn.disabled = true;
       resumePreviewState.elements.acceptBtn.textContent = selectedFormat === 'txt' ? 'Downloading...' : 'Uploading...';
@@ -5330,13 +5354,13 @@ function clearStoredResumePreview() {
     try {
       const baseFilename = resumePreviewState.cachedRecord?.meta?.pdfFileName || `tailored-resume-${Date.now()}`;
       const filenameWithoutExt = baseFilename.replace(/\.(pdf|txt)$/i, '');
-      
+
       if (selectedFormat === 'txt') {
         // Download as text file
         const textContent = convertHtmlToPlainText(resumePreviewState.lastPreparedHtml);
         const filename = `${filenameWithoutExt}.txt`;
         downloadTextCopy(textContent, filename);
-        
+
         // Also try to upload if possible (some platforms accept .txt resumes)
         const uploadElement = findUploadButton('resume');
         if (uploadElement) {
@@ -5365,7 +5389,7 @@ function clearStoredResumePreview() {
         const pdfDataUrl = await generatePdfFromHtml(resumePreviewState.lastPreparedHtml);
         const filename = `${filenameWithoutExt}.pdf`;
         downloadPdfCopy(pdfDataUrl, filename);
-        
+
         const uploadElement = findUploadButton('resume');
         if (!uploadElement) {
           throw new Error("Could not locate the Resume/CV upload field on this page.");
@@ -5596,6 +5620,20 @@ function clearStoredResumePreview() {
     resumePreviewState.elements.formatTabs?.forEach(tab => {
       tab.addEventListener('click', () => {
         const format = tab.dataset.format;
+
+        // Ask for permission when switching to PDF format
+        if (format === 'pdf' && resumePreviewState.selectedFormat !== 'pdf') {
+          const pdfConfirmed = confirm(
+            'Switch to PDF format?\n\n' +
+            'PDF files will be generated when you click "Download & Upload".\n' +
+            'Note: PDF generation may take a few seconds.'
+          );
+
+          if (!pdfConfirmed) {
+            return; // User canceled, don't switch to PDF
+          }
+        }
+
         resumePreviewState.selectedFormat = format;
         resumePreviewState.elements.formatTabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
@@ -5632,6 +5670,18 @@ function clearStoredResumePreview() {
         layoutMode: resumePreviewState.layoutMode
       });
     }, 150);
+
+    // Fix: Restore iframe content when user returns to the tab
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && resumePreviewState.lastPreparedHtml && resumePreviewState.elements?.iframeEl) {
+        const iframe = resumePreviewState.elements.iframeEl;
+        // Only restore if the iframe has lost its content
+        if (!iframe.srcdoc || iframe.srcdoc.length < 100) {
+          console.log('[Resume Developer] Restoring iframe content after visibility change');
+          iframe.srcdoc = resumePreviewState.lastPreparedHtml;
+        }
+      }
+    }, { passive: true });
 
     updateCtaText();
 
