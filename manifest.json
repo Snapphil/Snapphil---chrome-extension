@@ -30,7 +30,7 @@
     {
       "matches": ["<all_urls>"],
       "js": [
-        "lib/html2pdf/html2pdf.bundle.min.js",
+        "lib/jspdf/jspdf.umd.min.js",
         "content.js"
       ]
     }
@@ -40,6 +40,7 @@
       "resources": [
         "lib/pdfjs/build/pdf.worker.mjs",
         "lib/pdfjs/build/pdf.mjs",
+        "lib/jspdf/jspdf.umd.min.js",
         "lib/html2pdf/html2pdf.bundle.min.js",
         "icons/*",
         "settings/*",

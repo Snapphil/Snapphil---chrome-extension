@@ -4,9 +4,109 @@
    
    console.log("AI-Powered Job Application Automator loaded");
 
-  // html2pdf is now loaded directly via manifest content_scripts
+  // Add a function to check and load required libraries
   function loadRequiredLibraries() {
-    return Promise.resolve();
+    return new Promise((resolve) => {
+      const requiredLibraries = {
+        jspdf: {
+          check: () => typeof window.jspdf !== 'undefined' || typeof jsPDF !== 'undefined',
+          load: () => {
+            return new Promise((libResolve) => {
+              console.log("Loading jsPDF library dynamically...");
+              try {
+                const existingScript = document.querySelector('script[data-snapphil-lib="jspdf"]');
+                if (existingScript) {
+                  if (existingScript.dataset.loaded === 'true') {
+                    libResolve(true);
+                    return;
+                  }
+                  existingScript.addEventListener('load', () => libResolve(true), { once: true });
+                  existingScript.addEventListener('error', () => libResolve(false), { once: true });
+                  return;
+                }
+
+                const script = document.createElement('script');
+                script.src = chrome.runtime.getURL('lib/jspdf/jspdf.umd.min.js');
+                script.type = 'text/javascript';
+                script.dataset.snapphilLib = 'jspdf';
+                script.onload = () => {
+                  script.dataset.loaded = 'true';
+                  console.log("jsPDF loaded successfully");
+                  libResolve(true);
+                };
+                script.onerror = (err) => {
+                  script.dataset.loaded = 'error';
+                  console.error("Failed to load jsPDF:", err);
+                  // Fall back gracefully
+                  console.log("jsPDF couldn't be loaded, continuing without PDF generation support");
+                  libResolve(false);
+                };
+                (document.head || document.documentElement).appendChild(script);
+              } catch (error) {
+                console.error("Error during jsPDF loading setup:", error);
+                libResolve(false);
+              }
+            });
+          }
+        },
+        html2pdf: {
+          check: () => typeof window.html2pdf !== 'undefined' || typeof html2pdf !== 'undefined',
+          load: () => {
+            return new Promise((libResolve) => {
+              console.log("Loading html2pdf library dynamically...");
+              try {
+                const existingScript = document.querySelector('script[data-snapphil-lib="html2pdf"]');
+                if (existingScript) {
+                  if (existingScript.dataset.loaded === 'true') {
+                    libResolve(true);
+                    return;
+                  }
+                  existingScript.addEventListener('load', () => libResolve(true), { once: true });
+                  existingScript.addEventListener('error', () => libResolve(false), { once: true });
+                  return;
+                }
+
+                const script = document.createElement('script');
+                script.src = chrome.runtime.getURL('lib/html2pdf/html2pdf.bundle.min.js');
+                script.type = 'text/javascript';
+                script.dataset.snapphilLib = 'html2pdf';
+                script.onload = () => {
+                  script.dataset.loaded = 'true';
+                  console.log("html2pdf loaded successfully");
+                  libResolve(true);
+                };
+                script.onerror = (err) => {
+                  script.dataset.loaded = 'error';
+                  console.error("Failed to load html2pdf:", err);
+                  console.log("html2pdf couldn't be loaded, continuing with legacy PDF renderer");
+                  libResolve(false);
+                };
+                (document.head || document.documentElement).appendChild(script);
+              } catch (error) {
+                console.error("Error during html2pdf loading setup:", error);
+                libResolve(false);
+              }
+            });
+          }
+        }
+      };
+
+      // Check and load each required library
+      const librariesToLoad = [];
+      for (const [, library] of Object.entries(requiredLibraries)) {
+        if (!library.check()) {
+          librariesToLoad.push(library.load());
+        }
+      }
+
+      if (librariesToLoad.length > 0) {
+        Promise.all(librariesToLoad)
+          .then(() => resolve())
+          .catch(() => resolve()); // Continue even if some libraries fail to load
+      } else {
+        resolve();
+      }
+    });
   }
 
    // Add logging system
@@ -3913,7 +4013,8 @@ function clearStoredResumePreview() {
         border-radius: 8px;
         overflow: hidden;
         background: rgba(20, 20, 20, 0.3);
-        min-height: 320px;
+        min-height: 500px;
+        max-height: 800px;
         margin-top: 6px;
         padding: 10px;
         transition: all 0.25s ease;
@@ -3923,14 +4024,15 @@ function clearStoredResumePreview() {
       }
       .snapphil-resume-preview-frame {
         width: 100%;
-        height: 600px;
-        min-height: 600px;
+        height: 700px;
+        min-height: 500px;
         border: none;
         background: #fff;
         display: none;
         border-radius: 6px;
         box-shadow: 0 1px 8px rgba(0, 0, 0, 0.12);
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
       }
       .snapphil-resume-preview-frame.visible {
         display: block;
@@ -4373,23 +4475,105 @@ function clearStoredResumePreview() {
     try {
       const doc = iframe?.contentDocument;
       if (!doc || doc.getElementById('snapphil-preview-fit-styles')) return;
+      
+      // Ensure viewport meta tag exists for responsive scaling
+      if (doc.head && !doc.querySelector('meta[name="viewport"]')) {
+        const viewport = doc.createElement('meta');
+        viewport.name = 'viewport';
+        viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0';
+        doc.head.insertBefore(viewport, doc.head.firstChild);
+      }
+      
       const style = doc.createElement('style');
       style.id = 'snapphil-preview-fit-styles';
       style.textContent = `
         html {
           margin: 0 !important;
           padding: 0 !important;
-          background: #f5f5f5;
+          background: #fff;
           overflow-x: hidden;
+          width: 100%;
         }
         body {
           margin: 0 !important;
-          padding: 0.5in !important;
+          padding: 8px !important;
           background: #fff;
           width: 100% !important;
           max-width: 100% !important;
           box-sizing: border-box;
           overflow-x: hidden;
+          font-size: 8pt !important;
+        }
+        /* Force responsive mode for narrow iframe */
+        .header-name {
+          font-size: 14pt !important;
+          letter-spacing: 0.08em !important;
+          margin-bottom: 3pt !important;
+        }
+        .header-contact {
+          font-size: 7pt !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          gap: 1pt 6pt !important;
+        }
+        .header-contact span {
+          padding-right: 0 !important;
+        }
+        .header-contact span::after {
+          content: "" !important;
+        }
+        .header-note {
+          font-size: 7pt !important;
+          margin-bottom: 6pt !important;
+        }
+        .section {
+          margin-bottom: 6pt !important;
+        }
+        .section-title {
+          font-size: 9pt !important;
+          margin: 4pt 0 3pt 0 !important;
+          padding-bottom: 1pt !important;
+        }
+        .exp-header, .edu-header {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          margin-bottom: 2pt !important;
+        }
+        .exp-title, .exp-title strong {
+          font-size: 9pt !important;
+          margin-bottom: 1pt !important;
+        }
+        .exp-meta {
+          font-size: 7.5pt !important;
+          white-space: normal !important;
+        }
+        .two-col {
+          flex-direction: column !important;
+          gap: 4pt !important;
+        }
+        ul {
+          margin: 2pt 0 4pt 12pt !important;
+        }
+        li {
+          font-size: 7.5pt !important;
+          margin-bottom: 1.5pt !important;
+          line-height: 1.3 !important;
+        }
+        .skills-row {
+          font-size: 7.5pt !important;
+          margin-left: 10pt !important;
+        }
+        .skills-row li {
+          font-size: 7.5pt !important;
+        }
+        .proj-item strong:first-child,
+        .exp-item strong:first-child {
+          font-size: 9pt !important;
+        }
+        * {
+          max-width: 100%;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
       `;
       (doc.head || doc.documentElement).appendChild(style);
@@ -4481,6 +4665,111 @@ function clearStoredResumePreview() {
       span.innerHTML = node.innerHTML;
       node.replaceWith(span);
     });
+
+    // Add viewport meta tag for responsive display
+    if (doc.head && !doc.querySelector('meta[name="viewport"]')) {
+      const viewport = doc.createElement('meta');
+      viewport.name = 'viewport';
+      viewport.content = 'width=device-width, initial-scale=1.0';
+      doc.head.insertBefore(viewport, doc.head.firstChild);
+    }
+
+    // Inject responsive CSS for narrow viewports (e.g., extension popup)
+    const existingStyle = doc.querySelector('style');
+    if (existingStyle && doc.head) {
+      const responsiveCss = `
+        /* Responsive overrides for narrow viewports */
+        @media screen and (max-width: 700px) {
+          body {
+            max-width: 100% !important;
+            padding: 12px !important;
+            font-size: 10pt !important;
+          }
+          .header-name {
+            font-size: 16pt !important;
+            letter-spacing: 0.1em !important;
+          }
+          .header-contact {
+            font-size: 8pt !important;
+            gap: 1pt 8pt !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          .header-contact span {
+            padding-right: 0 !important;
+          }
+          .header-contact.multi-line span::after {
+            content: "" !important;
+          }
+          .header-note {
+            font-size: 8pt !important;
+          }
+          .section-title {
+            font-size: 10pt !important;
+            margin: 4pt 0 3pt 0 !important;
+          }
+          .exp-header, .edu-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+          .exp-title {
+            font-size: 10pt !important;
+            margin-bottom: 2pt !important;
+          }
+          .exp-meta {
+            font-size: 9pt !important;
+            white-space: normal !important;
+          }
+          .two-col {
+            flex-direction: column !important;
+            gap: 4pt !important;
+          }
+          ul {
+            margin-left: 14pt !important;
+          }
+          li {
+            font-size: 9pt !important;
+          }
+          .skills-row {
+            font-size: 9pt !important;
+            margin-left: 12pt !important;
+          }
+          .proj-item strong:first-child,
+          .exp-item strong:first-child {
+            font-size: 10pt !important;
+          }
+        }
+        
+        @media screen and (max-width: 500px) {
+          body {
+            padding: 8px !important;
+            font-size: 9pt !important;
+          }
+          .header-name {
+            font-size: 14pt !important;
+          }
+          .header-contact {
+            font-size: 7pt !important;
+          }
+          .header-note {
+            font-size: 7pt !important;
+          }
+          .section-title {
+            font-size: 9pt !important;
+          }
+          .exp-title {
+            font-size: 9pt !important;
+          }
+          .exp-meta {
+            font-size: 8pt !important;
+          }
+          li, .skills-row {
+            font-size: 8pt !important;
+          }
+        }
+      `;
+      existingStyle.textContent += responsiveCss;
+    }
   }
 
   function normalizeResumeHtml(html) {
@@ -4569,6 +4858,54 @@ function clearStoredResumePreview() {
     return normalizeResumeHtml(basicHtml);
   }
 
+  function buildSvgMarkupFromHtml(preparedHtml) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(preparedHtml, 'text/html');
+    const styleBlocks = [];
+    doc.querySelectorAll('style').forEach((styleNode) => {
+      styleBlocks.push(styleNode.innerHTML);
+      styleNode.remove();
+    });
+    const bodyContent = doc.body ? doc.body.innerHTML : preparedHtml;
+    const combinedStyles = `
+      body { margin: 0; background: #fff; color: #111; font-family: "Helvetica Neue", Arial, sans-serif; }
+      .resume-svg-root { width: 816px; min-height: 1056px; padding: 32px 48px; box-sizing: border-box; }
+      ${styleBlocks.join('\n')}
+    `;
+
+    return `
+      <svg xmlns="http://www.w3.org/2000/svg" width="816" height="1056">
+        <foreignObject width="100%" height="100%">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <style>${combinedStyles}</style>
+            <div class="resume-svg-root">${bodyContent}</div>
+          </div>
+        </foreignObject>
+      </svg>
+    `;
+  }
+
+  function renderSvgToImageDataUrl(svgMarkup) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 816;
+        canvas.height = 1056;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        try {
+          resolve(canvas.toDataURL('image/png'));
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = reject;
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgMarkup);
+    });
+  }
 
   function renderPdfWithHtml2Pdf(preparedHtml) {
     return new Promise((resolve, reject) => {
@@ -4580,15 +4917,15 @@ function clearStoredResumePreview() {
 
       const iframe = document.createElement('iframe');
       iframe.style.position = 'fixed';
-      iframe.style.left = '-9999px';
+      iframe.style.left = '-2000px';
       iframe.style.top = '0';
-      iframe.style.width = '816px';
-      iframe.style.height = '1056px';
+      iframe.style.width = '900px';
+      iframe.style.height = '1200px';
       iframe.style.opacity = '0';
       iframe.style.pointerEvents = 'none';
       iframe.style.border = '0';
       iframe.style.visibility = 'hidden';
-      iframe.style.zIndex = '-9999';
+      iframe.style.zIndex = '-1';
       iframe.setAttribute('aria-hidden', 'true');
       iframe.tabIndex = -1;
 
@@ -4612,43 +4949,28 @@ function clearStoredResumePreview() {
             throw new Error("Temporary resume document unavailable");
           }
 
-          // Wait a bit for fonts and layout to settle
-          await new Promise(r => setTimeout(r, 300));
-
           iframeDoc.documentElement.style.background = '#ffffff';
           iframeDoc.body.style.margin = '0';
-          iframeDoc.body.style.padding = '0';
           iframeDoc.body.style.background = '#ffffff';
 
-          const scale = 2;
+          const scale = Math.min(3, Math.max(1.5, window.devicePixelRatio || 1));
           const worker = html2pdfLib().set({
-            margin: 0,
+            margin: [0.5, 0.5, 0.5, 0.5],
             filename: 'tailored-resume.pdf',
             html2canvas: {
               scale,
               useCORS: true,
-              allowTaint: false,
               backgroundColor: '#ffffff',
               logging: false,
-              letterRendering: true,
-              imageTimeout: 0,
-              removeContainer: true,
-              windowWidth: 816,
-              windowHeight: 1056,
-              scrollX: 0,
-              scrollY: 0,
-              x: 0,
-              y: 0
+              windowWidth: 816
             },
             jsPDF: {
-              unit: 'pt',
-              format: [816, 1056],
-              orientation: 'portrait',
-              compress: true
+              unit: 'in',
+              format: 'letter',
+              orientation: 'portrait'
             },
             pagebreak: {
-              mode: ['avoid-all', 'css', 'legacy'],
-              avoid: ['img', 'tr', 'li']
+              mode: ['css', 'legacy']
             }
           }).from(iframeDoc.body);
 
@@ -4670,48 +4992,327 @@ function clearStoredResumePreview() {
 
   async function generatePdfFromHtml(preparedHtml) {
     if (!preparedHtml) throw new Error("No resume HTML available");
-    
-    console.log('[Resume Developer] Starting PDF generation...');
     await loadRequiredLibraries();
-    console.log('[Resume Developer] Libraries loaded, checking for html2pdf...');
 
-    // Wait for the library to be available in the global scope
-    let attempts = 0;
-    while (attempts < 30) {
-      const html2pdfLib = window.html2pdf || (typeof html2pdf !== 'undefined' ? html2pdf : undefined);
-      if (html2pdfLib) {
-        console.log('[Resume Developer] html2pdf library found, generating PDF...');
-        return await renderPdfWithHtml2Pdf(preparedHtml);
-      }
-      
-      if (attempts === 0) {
-        console.log('[Resume Developer] Waiting for html2pdf to become available...');
-      }
-      
-      if (attempts % 10 === 9) {
-        console.warn(`[Resume Developer] Still waiting for html2pdf... (attempt ${attempts + 1}/30)`);
-      }
-      
-      await new Promise(r => setTimeout(r, 100));
-      attempts++;
+    try {
+      return await renderPdfWithHtml2Pdf(preparedHtml);
+    } catch (html2pdfError) {
+      console.error('[Resume Developer] html2pdf generation failed, using legacy renderer:', html2pdfError);
     }
 
-    console.error('[Resume Developer] html2pdf library failed to load after 3 seconds');
-    console.error('[Resume Developer] window.html2pdf:', typeof window.html2pdf);
-    console.error('[Resume Developer] html2pdf:', typeof html2pdf);
-    
-    // Check if script element exists
-    const scriptEl = document.querySelector('script[data-snapphil-lib="html2pdf"]');
-    if (scriptEl) {
-      console.error('[Resume Developer] Script element found, state:', scriptEl.dataset.loadState);
-      console.error('[Resume Developer] Script src:', scriptEl.src);
-    } else {
-      console.error('[Resume Developer] Script element not found in DOM');
+    if (typeof window.jspdf === 'undefined') {
+      throw new Error("PDF library not available");
     }
 
-    throw new Error("html2pdf library not available - PDF generation is not possible");
+    const { jsPDF } = window.jspdf;
+    console.log('[Resume Developer] Falling back to legacy jsPDF renderer...');
+
+    try {
+      return renderTextBasedPdf(preparedHtml, jsPDF);
+    } catch (textError) {
+      console.error('[Resume Developer] Text-based PDF generation failed, falling back to rasterized version:', textError);
+      return renderRasterizedPdf(preparedHtml, jsPDF);
+    }
   }
 
+  function renderTextBasedPdf(preparedHtml, jsPDF) {
+    const pdf = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+    const margin = 36; // 0.5in
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const maxWidth = pageWidth - (margin * 2);
+    let yPos = margin;
+    const baseLineHeight = 12;
+    const baseFont = "times";
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = preparedHtml;
+
+    const getDirectChildren = (root, selector) => {
+      if (!root) return [];
+      const matchers = selector.split(',').map(s => s.trim()).filter(Boolean);
+      return Array.from(root.children || []).filter(child =>
+        matchers.some(sel => child.matches(sel))
+      );
+    };
+
+    const addPageIfNeeded = (extraSpace = baseLineHeight) => {
+      if (yPos > pageHeight - margin - extraSpace) {
+        pdf.addPage();
+        yPos = margin;
+      }
+    };
+
+    const drawTextBlock = (text, options = {}) => {
+      if (!text) return;
+      const {
+        fontSize = 10,
+        fontStyle = "normal",
+        indent = 0,
+        lineSpacing = baseLineHeight,
+        uppercase = false
+      } = options;
+      const formattedText = uppercase ? text.toUpperCase() : text;
+      const lines = pdf.splitTextToSize(formattedText.trim(), maxWidth - indent);
+      if (!lines.length) return;
+      addPageIfNeeded(lines.length * lineSpacing);
+      pdf.setFont(baseFont, fontStyle);
+      pdf.setFontSize(fontSize);
+      pdf.text(lines, margin + indent, yPos);
+      yPos += (lines.length * lineSpacing);
+    };
+
+    // Header: Name
+    const nameEl = tempDiv.querySelector('h1, .header-name, .header-name div');
+    if (nameEl && nameEl.textContent.trim()) {
+      addPageIfNeeded(20);
+      pdf.setFont(baseFont, "bold");
+      pdf.setFontSize(20);
+      const nameText = nameEl.textContent.trim().toUpperCase();
+      const nameWidth = pdf.getTextWidth(nameText);
+      const centerX = (pageWidth - nameWidth) / 2;
+      pdf.text(nameText, centerX, yPos);
+      yPos += 18;
+    }
+
+    // Contact line - handle spans or plain text
+    const contactEl = tempDiv.querySelector('.header-contact');
+    if (contactEl) {
+      const spans = contactEl.querySelectorAll('span');
+      if (spans.length > 0) {
+        // Multi-line contact with spans
+        const contactItems = Array.from(spans).map(s => s.textContent.trim()).filter(Boolean);
+        const contactLine = contactItems.join(' | ');
+        addPageIfNeeded(12);
+        pdf.setFont(baseFont, "normal");
+        pdf.setFontSize(9);
+        const contactWidth = pdf.getTextWidth(contactLine);
+        const centerX = (pageWidth - contactWidth) / 2;
+        pdf.text(contactLine, centerX, yPos);
+        yPos += 12;
+      } else {
+        // Fallback to plain text
+        const contactText = contactEl.textContent.trim();
+        if (contactText) {
+          addPageIfNeeded(12);
+          pdf.setFont(baseFont, "normal");
+          pdf.setFontSize(9);
+          const contactWidth = pdf.getTextWidth(contactText);
+          const centerX = (pageWidth - contactWidth) / 2;
+          pdf.text(contactText, centerX, yPos);
+          yPos += 12;
+        }
+      }
+    }
+
+    // Work authorization / header note
+    const noteEl = tempDiv.querySelector('.header-note');
+    if (noteEl && noteEl.textContent.trim()) {
+      addPageIfNeeded(12);
+      pdf.setFont(baseFont, "italic");
+      pdf.setFontSize(9);
+      const noteText = noteEl.textContent.trim();
+      const noteWidth = pdf.getTextWidth(noteText);
+      const centerX = (pageWidth - noteWidth) / 2;
+      pdf.text(noteText, centerX, yPos);
+      yPos += 14;
+    }
+
+    const sectionNodes = tempDiv.querySelectorAll('.section');
+    sectionNodes.forEach(section => {
+      const heading = section.querySelector('.section-title, h2, h3');
+      const headingText = heading?.textContent?.trim();
+      if (headingText && headingText.toUpperCase().includes('WHAT WAS TAILORED')) {
+        return;
+      }
+      
+      // Handle two-column layout (Education + Publications)
+      if (section.classList.contains('two-col')) {
+        const columns = section.querySelectorAll(':scope > div');
+        columns.forEach(col => {
+          const colHeading = col.querySelector('.section-title, h2');
+          if (colHeading && colHeading.textContent.trim()) {
+            addPageIfNeeded(baseLineHeight * 2);
+            pdf.setFont(baseFont, "bold");
+            pdf.setFontSize(11);
+            pdf.text(colHeading.textContent.trim().toUpperCase(), margin, yPos);
+            yPos += baseLineHeight;
+            pdf.setLineWidth(0.5);
+            pdf.line(margin, yPos, pageWidth - margin, yPos);
+            yPos += 6;
+          }
+          
+          const items = col.querySelectorAll('.edu-item, .pub-item');
+          items.forEach(item => {
+            const itemText = item.textContent.trim();
+            if (itemText) {
+              addPageIfNeeded(baseLineHeight * 2);
+              pdf.setFont(baseFont, "normal");
+              pdf.setFontSize(10);
+              const lines = pdf.splitTextToSize(itemText, maxWidth);
+              pdf.text(lines, margin, yPos);
+              yPos += (lines.length * baseLineHeight) + 4;
+            }
+          });
+          yPos += 4;
+        });
+        return;
+      }
+      
+      if (headingText) {
+        addPageIfNeeded(baseLineHeight * 2);
+        pdf.setFont(baseFont, "bold");
+        pdf.setFontSize(11);
+        pdf.text(headingText.toUpperCase(), margin, yPos);
+        yPos += baseLineHeight;
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 6;
+      }
+
+      const expBlocks = getDirectChildren(section, '.exp-item, .proj-item, .skill-group, .edu-item, .pub-item, .tailoring-list, p');
+      expBlocks.forEach(block => {
+        if (block.matches('.tailoring-list')) {
+          return; // Skip tailoring section
+        }
+
+        if (block.matches('.exp-item, .proj-item')) {
+          // Check if there's an exp-header div (flex layout with title and dates)
+          const header = block.querySelector('.exp-header');
+          if (header) {
+            const title = header.querySelector('.exp-title');
+            const meta = header.querySelector('.exp-meta, span');
+            
+            if (title && title.textContent.trim()) {
+              addPageIfNeeded(baseLineHeight * 3);
+              pdf.setFont(baseFont, "bold");
+              pdf.setFontSize(11);
+              const titleText = title.textContent.trim();
+              pdf.text(titleText, margin, yPos);
+              
+              // Meta (dates) on the right side
+              if (meta && meta.textContent.trim()) {
+                pdf.setFont(baseFont, "italic");
+                pdf.setFontSize(10);
+                const metaText = meta.textContent.trim();
+                const metaWidth = pdf.getTextWidth(metaText);
+                pdf.text(metaText, pageWidth - margin - metaWidth, yPos);
+              }
+              yPos += baseLineHeight + 2;
+            }
+          } else {
+            // Fallback: look for title and meta directly
+            const title = block.querySelector('.exp-title, strong:first-child');
+            const meta = block.querySelector('.exp-meta');
+            
+            if (title && title.textContent.trim()) {
+              addPageIfNeeded(baseLineHeight * 3);
+              pdf.setFont(baseFont, "bold");
+              pdf.setFontSize(11);
+              const titleText = title.textContent.trim();
+              pdf.text(titleText, margin, yPos);
+              
+              // Meta (dates) on the right side
+              if (meta && meta.textContent.trim()) {
+                pdf.setFont(baseFont, "italic");
+                pdf.setFontSize(10);
+                const metaText = meta.textContent.trim();
+                const metaWidth = pdf.getTextWidth(metaText);
+                pdf.text(metaText, pageWidth - margin - metaWidth, yPos);
+              }
+              yPos += baseLineHeight + 2;
+            }
+          }
+          
+          // Company/subtitle line (if exists)
+          const subheading = block.querySelector('.subheading, em, i');
+          if (subheading && subheading.textContent.trim()) {
+            pdf.setFont(baseFont, "italic");
+            pdf.setFontSize(10);
+            const subText = subheading.textContent.trim();
+            const lines = pdf.splitTextToSize(subText, maxWidth);
+            pdf.text(lines, margin, yPos);
+            yPos += (lines.length * baseLineHeight) + 2;
+          }
+          
+          // Bullets
+          const bullets = block.querySelectorAll('ul li, :scope > ul > li');
+          if (bullets.length) {
+            bullets.forEach(li => {
+              const text = li.textContent.trim();
+              if (!text) return;
+              addPageIfNeeded(baseLineHeight * 2);
+              const lines = pdf.splitTextToSize(text, maxWidth - 15);
+              pdf.setFont(baseFont, "normal");
+              pdf.setFontSize(10);
+              pdf.text('•', margin, yPos);
+              pdf.text(lines, margin + 15, yPos);
+              yPos += (lines.length * baseLineHeight) + 2;
+            });
+          }
+          yPos += 4;
+          return;
+        }
+
+        if (block.matches('.skill-group')) {
+          // Skills section - render as bullet list or check for existing bullets
+          const bullets = block.querySelectorAll('li');
+          if (bullets.length) {
+            bullets.forEach(li => {
+              const text = li.textContent.trim();
+              if (!text) return;
+              addPageIfNeeded(baseLineHeight * 2);
+              const lines = pdf.splitTextToSize(text, maxWidth - 15);
+              pdf.setFont(baseFont, "normal");
+              pdf.setFontSize(10);
+              pdf.text('•', margin, yPos);
+              pdf.text(lines, margin + 15, yPos);
+              yPos += (lines.length * baseLineHeight) + 2;
+            });
+          } else {
+            // Plain text skills - render as a single bullet
+            const skillText = block.textContent.trim();
+            if (skillText) {
+              addPageIfNeeded(baseLineHeight * 2);
+              pdf.setFont(baseFont, "normal");
+              pdf.setFontSize(10);
+              const lines = pdf.splitTextToSize(skillText, maxWidth - 15);
+              pdf.text('•', margin, yPos);
+              pdf.text(lines, margin + 15, yPos);
+              yPos += (lines.length * baseLineHeight) + 2;
+            }
+          }
+          return;
+        }
+
+        if (block.matches('p')) {
+          const paraText = block.textContent.trim();
+          if (paraText) {
+            addPageIfNeeded(baseLineHeight * 2);
+            pdf.setFont(baseFont, "normal");
+            pdf.setFontSize(10);
+            const lines = pdf.splitTextToSize(paraText, maxWidth);
+            pdf.text(lines, margin, yPos);
+            yPos += (lines.length * baseLineHeight) + 2;
+          }
+        }
+      });
+
+      yPos += 6;
+    });
+
+    console.log('[Resume Developer] PDF generated using text-based renderer');
+    return pdf.output('datauristring');
+  }
+
+  async function renderRasterizedPdf(preparedHtml, jsPDF) {
+    console.warn('[Resume Developer] Falling back to rasterized PDF (text not selectable)');
+    const svgMarkup = buildSvgMarkupFromHtml(preparedHtml);
+    const pngDataUrl = await renderSvgToImageDataUrl(svgMarkup);
+    const pdf = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+    pdf.addImage(pngDataUrl, 'PNG', 0, 0, 612, 792, undefined, 'FAST');
+    return pdf.output('datauristring');
+  }
 
   async function handleResumeAcceptClick() {
     if (resumePreviewState.acceptInFlight || !resumePreviewState.lastPreparedHtml) {

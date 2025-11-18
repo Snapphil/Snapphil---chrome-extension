@@ -350,6 +350,11 @@ LAYOUT (KEEP THIS EXACT CSS/STRUCTURE)
   <div class="header-note">{WORK_AUTH_LINE}</div>
 
   <div class="section">
+    <div class="section-title">EDUCATION</div>
+    {EDUCATION_BLOCKS}
+  </div>
+
+  <div class="section">
     <div class="section-title">PROFESSIONAL EXPERIENCE</div>
     {EXPERIENCE_BLOCKS}
   </div>
@@ -364,15 +369,9 @@ LAYOUT (KEEP THIS EXACT CSS/STRUCTURE)
     {SKILL_BLOCKS}
   </div>
 
-  <div class="section two-col">
-    <div>
-      <div class="section-title">EDUCATION</div>
-      {EDUCATION_BLOCKS}
-    </div>
-    <div>
-      <div class="section-title">PUBLICATIONS</div>
-      {PUBLICATION_BLOCKS}
-    </div>
+  <div class="section">
+    <div class="section-title">PUBLICATIONS</div>
+    {PUBLICATION_BLOCKS}
   </div>
 </body>
 </html>

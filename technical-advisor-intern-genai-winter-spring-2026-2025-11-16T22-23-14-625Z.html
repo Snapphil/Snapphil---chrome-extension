@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ASHWIN A. SHARMA — Resume</title>
   <style>
     @page { size: 8.5in 11in; margin: 0.5in; }
@@ -96,6 +97,96 @@
     .skills-row li {
       margin-bottom: 2pt;
       line-height: 1.15;
+    }
+    
+    /* Responsive styles for narrow viewports */
+    @media screen and (max-width: 700px) {
+      body {
+        max-width: 100% !important;
+        padding: 12px !important;
+        font-size: 10pt !important;
+      }
+      .header-name {
+        font-size: 16pt !important;
+        letter-spacing: 0.1em !important;
+      }
+      .header-contact {
+        font-size: 8pt !important;
+        gap: 1pt 8pt !important;
+        flex-direction: column !important;
+        align-items: center !important;
+      }
+      .header-contact span {
+        padding-right: 0 !important;
+      }
+      .header-contact.multi-line span::after {
+        content: "" !important;
+      }
+      .header-note {
+        font-size: 8pt !important;
+      }
+      .section-title {
+        font-size: 10pt !important;
+        margin: 4pt 0 3pt 0 !important;
+      }
+      .exp-header, .edu-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+      }
+      .exp-title {
+        font-size: 10pt !important;
+        margin-bottom: 2pt !important;
+      }
+      .exp-meta {
+        font-size: 9pt !important;
+        white-space: normal !important;
+      }
+      .two-col {
+        flex-direction: column !important;
+        gap: 4pt !important;
+      }
+      ul {
+        margin-left: 14pt !important;
+      }
+      li {
+        font-size: 9pt !important;
+      }
+      .skills-row {
+        font-size: 9pt !important;
+        margin-left: 12pt !important;
+      }
+      .proj-item strong:first-child,
+      .exp-item strong:first-child {
+        font-size: 10pt !important;
+      }
+    }
+    
+    @media screen and (max-width: 500px) {
+      body {
+        padding: 8px !important;
+        font-size: 9pt !important;
+      }
+      .header-name {
+        font-size: 14pt !important;
+      }
+      .header-contact {
+        font-size: 7pt !important;
+      }
+      .header-note {
+        font-size: 7pt !important;
+      }
+      .section-title {
+        font-size: 9pt !important;
+      }
+      .exp-title {
+        font-size: 9pt !important;
+      }
+      .exp-meta {
+        font-size: 8pt !important;
+      }
+      li, .skills-row {
+        font-size: 8pt !important;
+      }
     }
   </style>
 </head>
